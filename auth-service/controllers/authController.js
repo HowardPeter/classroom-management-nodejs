@@ -19,37 +19,27 @@ const createNewRefreshToken = async (token, userId) => {
 }
 
 export const token = asyncWrapper(async (req, res) => {
-  const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken)
-    return res.status(404).json({ msg: "No token in cookie" });
+  const tokenCookie = req.cookies.refreshToken;
+  if (!tokenCookie)
+    return res.status(404).json({ msg: "No token in cookie!" });
 
-  const isRefreshToken = await TokenRepository.findOne({ refreshToken: refreshToken })
+  const isRefreshToken = await TokenRepository.findOne({ refreshToken: tokenCookie })
   if (!isRefreshToken)
     return res.status(404).json({ msg: "Token is not available!" });
 
   let user;
   try {
-    user = JwtFacade.verifyToken(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    user = JwtFacade.verifyToken(tokenCookie, process.env.REFRESH_TOKEN_SECRET);
     console.log("User: ", user);
   } catch (err) {
-    await TokenRepository.deleteByToken(refreshToken); // Xóa token trong db nếu expired
+    await TokenRepository.deleteByToken(tokenCookie); // Xóa token trong db nếu expired
     return res.status(401).json({ msg: "Invalid or expired refresh token" });
   }
 
-  // Tạo accessToken ngay cho client
-  const accessToken = JwtFacade.generateAccessToken({ userId: user.userId });
-
   // Rotate refreshToken
-  await TokenRepository.deleteByToken(refreshToken)
-  const newRefreshToken = JwtFacade.generateRefreshToken({ userId: user.userId });
-  await createNewRefreshToken(newRefreshToken, user.userId);
-
-  res.cookie("refreshToken", newRefreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  await TokenRepository.deleteByToken(tokenCookie);
+  const { accessToken, refreshToken } = await JwtFacade.setTokens(res, user.userId)
+  await createNewRefreshToken(refreshToken, user.userId);
 
   res.status(200).json({ accessToken });
 });
@@ -90,21 +80,8 @@ export const login = asyncWrapper(async (req, res) => {
   if (!isPassword)
     throw new UnauthorizedError("Invalid password!");
 
-  const accessToken = JwtFacade.generateAccessToken({ userId: user._id });
-  const refreshToken = JwtFacade.generateRefreshToken({ userId: user._id });
-  const newRefreshToken = {
-    refreshToken: refreshToken,
-    user: user._id
-  }
-  await TokenRepository.createOne(newRefreshToken);
-
-  // Lưu vào httpOnly cookie
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  const { accessToken, refreshToken } = await JwtFacade.setTokens(res, user._id);
+  await createNewRefreshToken(refreshToken, user._id)
 
   res.status(200).json({ accessToken: accessToken, refreshToken: refreshToken });
 })

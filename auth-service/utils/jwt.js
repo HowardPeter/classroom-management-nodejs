@@ -20,4 +20,19 @@ export class JwtFacade {
   static generateRefreshToken(payload) {
     return jwt.sign(payload, this.REFRESH_TOKEN_SECRET, { expiresIn: this.refreshTokenExpiry });
   }
+
+  static async setTokens(res, userId) {
+    const accessToken = this.generateAccessToken({ userId: userId });
+    const refreshToken = this.generateRefreshToken({ userId: userId });
+
+    // Lưu vào httpOnly cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { accessToken, refreshToken }
+  }
 }
