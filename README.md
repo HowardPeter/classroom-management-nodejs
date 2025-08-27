@@ -1,0 +1,1 @@
+docker exec -it node-7-studentmanager-mongodb-1 mongosh -u admin -p secret
