@@ -9,6 +9,17 @@ services:
     volumes:
       - user:/data/db
 
+  student-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: studentdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - student:/var/lib/postgresql/data
+
   # auth:
   #   build:
   #     context: ./auth-service
