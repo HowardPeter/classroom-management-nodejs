@@ -1,0 +1,28 @@
+name: Action CI build
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**/README.md'
+      - '**/.dockerignore'
+      - '**/.gitignore'
+      - '**/Dockerfile'
+      - '/docs/**'
+  workflow_dispatch:
+
+jobs:
+  build-auth:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+      
+      - name: Setup environment & cache dependencies
+        uses: ./.github/setup-env
+
+      - name: Output information
+        run: echo "Cache used? ${{ steps.cache-deps.outputs.used-cache }}"
+      
+      
