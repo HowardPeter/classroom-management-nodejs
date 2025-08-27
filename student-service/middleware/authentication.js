@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { InternalServerError } from '../errors/errors.js';
+import fs from 'fs';
 
 export default function authentication(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -12,7 +13,8 @@ export default function authentication(req, res, next) {
   if (!token)
     return res.status(401);
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+  const publicKey = fs.readFileSync("public.pem", "utf8");
+  jwt.verify(token, publicKey, { algorithms: ["RS256"] }, (err, user) => {
     if (err) {
       return next(err)
     }
