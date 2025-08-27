@@ -5,6 +5,11 @@ inputs:
     description: 'This step needs to cache or not'
     required: false
     default: 'true'
+  
+  working-directory:
+    description: 'Path to the service folder'
+    required: false
+    default: '.'
 
 outputs:
   used-cache:
@@ -17,6 +22,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version: 22
+      working-directory: ${{ inputs.working-directory }}
 
     - name: Caching dependencies
       if: inputs.caching == 'true'
@@ -27,6 +33,7 @@ runs:
         key: deps-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
         restore-keys: |
           deps-node-modules-${{ runner.os }}-
+      working-directory: ${{ inputs.working-directory }}
     
     - name: Install dependencies
       if: step.cache.output.cache-hit != true || inputs.caching != 'true'
@@ -34,3 +41,4 @@ runs:
         npm ci
         echo "cache='${{ inputs.caching }}'" >> $GITHUB_OUTPUT
       shell: bash
+      working-directory: ${{ inputs.working-directory }}

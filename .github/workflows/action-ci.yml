@@ -15,12 +15,17 @@ on:
 jobs:
   build-auth:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: auth-service
     steps:
       - name: Get code
         uses: actions/checkout@v4
-      
+
       - name: Setup environment & cache dependencies
         uses: ./.github/setup-env
+        with:
+          working-directory: auth-service
 
       - name: Output information
         run: echo "Cache used? ${{ steps.cache-deps.outputs.used-cache }}"
