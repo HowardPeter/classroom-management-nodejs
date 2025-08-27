@@ -9,6 +9,5 @@ router.post('/login', login);
 router.post('/refresh', token);
 router.delete('/logout', logout);
 router.patch('/password', authentication, changePassword);
-router.get('/user', authentication, (req, res) => res.json(`Hello ${req.user.userId}`))
 
 export default router;

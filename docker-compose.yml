@@ -1,13 +1,13 @@
 services:
-  # mongodb:
-  #   image: mongo
-  #   ports:
-  #     - "27017:27017"
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: admin
-  #     MONGO_INITDB_ROOT_PASSWORD: secret
-  #   volumes:
-  #     - user:/data/db
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    volumes:
+      - user:/data/db
 
   student-db:
     image: postgres:17-alpine
@@ -33,5 +33,5 @@ services:
   #   depends_on:
   #     - mongodb
 volumes:
-  # user:
+  user:
   student_data:

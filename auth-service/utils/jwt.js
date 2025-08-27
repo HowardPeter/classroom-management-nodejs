@@ -1,24 +1,30 @@
 import jwt from "jsonwebtoken"
 import dotenv from 'dotenv'
+import fs from 'fs'
 
 dotenv.config()
 
 export class JwtFacade {
-  static ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+  static ACCESS_TOKEN_SECRET = fs.readFileSync("private.pem", "utf8");;
   static REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-  static accessTokenExpiry = '15s';
-  static refreshTokenExpiry = '20s';
+  static accessTokenExpiry = '120s';
+  static refreshTokenExpiry = '7d';
 
-  static verifyToken(token, secret) {
-    return jwt.verify(token, secret);
+  static verifyToken(token, secret, options = {}) {
+    return jwt.verify(token, secret, options);
   }
 
   static generateAccessToken(payload) {
-    return jwt.sign(payload, this.ACCESS_TOKEN_SECRET, { expiresIn: this.accessTokenExpiry });
+    return jwt.sign(payload, this.ACCESS_TOKEN_SECRET, {
+      algorithm: "RS256",
+      expiresIn: this.accessTokenExpiry,
+    });
   }
 
   static generateRefreshToken(payload) {
-    return jwt.sign(payload, this.REFRESH_TOKEN_SECRET, { expiresIn: this.refreshTokenExpiry });
+    return jwt.sign(payload, this.REFRESH_TOKEN_SECRET, {
+      expiresIn: this.refreshTokenExpiry,
+    });
   }
 
   static async setTokens(res, userId) {
