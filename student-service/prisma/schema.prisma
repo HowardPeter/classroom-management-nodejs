@@ -14,12 +14,12 @@ datasource db {
 }
 
 model Student {
-  student_id      String   @id @default(uuid())
+  student_id      String    @id @default(uuid())
   full_name       String
-  date_of_birth   DateTime
-  gender          String
-  phone           String   @unique
-  email           String   @unique
-  address         String
-  enrollment_date DateTime @default(now())
+  date_of_birth   DateTime?
+  gender          String?
+  phone           String?   @unique
+  email           String?   @unique
+  address         String?
+  enrollment_date DateTime? @default(now())
 }

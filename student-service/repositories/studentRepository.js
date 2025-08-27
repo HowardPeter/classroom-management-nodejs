@@ -37,16 +37,14 @@ class StudentRepository {
 
   // Tạo mới
   async createOne(data) {
-    return await this.prisma.student.create({
-      data,
-    });
+    return await this.prisma.student.create({ data: data });
   }
 
   // Cập nhật theo ID
   async updateById(id, data) {
     return await this.prisma.student.update({
       where: { student_id: id },
-      data,
+      data: data,
     });
   }
 

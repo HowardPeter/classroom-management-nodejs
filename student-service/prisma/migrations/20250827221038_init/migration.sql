@@ -2,12 +2,12 @@
 CREATE TABLE "public"."Student" (
     "student_id" TEXT NOT NULL,
     "full_name" TEXT NOT NULL,
-    "date_of_birth" TIMESTAMP(3) NOT NULL,
-    "gender" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "address" TEXT NOT NULL,
-    "enrollment_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "date_of_birth" TIMESTAMP(3),
+    "gender" TEXT,
+    "phone" TEXT,
+    "email" TEXT,
+    "address" TEXT,
+    "enrollment_date" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Student_pkey" PRIMARY KEY ("student_id")
 );
