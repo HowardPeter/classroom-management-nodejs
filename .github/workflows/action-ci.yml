@@ -1,0 +1,42 @@
+name: Action CI build
+
+on:
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths-ignore:
+  #     - '**/README.md'
+  #     - '**/.dockerignore'
+  #     - '**/.gitignore'
+  #     - '**/Dockerfile'
+  #     - '/docs/**'
+  workflow_dispatch:
+
+jobs:
+  build-auth:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: auth-service
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Caching dependencies
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: deps-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            deps-node-modules-${{ runner.os }}-
+      
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != true
+        run: npm ci
+        shell: bash
