@@ -10,6 +10,9 @@ RUN npm install
 
 COPY . .
 
+# Generate Prisma client cho môi trường Alpine (linux-musl)
+RUN npx prisma generate
+
 EXPOSE 3002
 
 CMD ["npm", "run", "dev"]
@@ -25,8 +28,11 @@ USER nodeusr
 
 COPY . .
 
+# Generate Prisma client lại cho môi trường production
+RUN npx prisma generate
+
 ENV NODE_ENV=production
 
-EXPOSE 3001
+EXPOSE 3002
 
 CMD ["npm", "start"]

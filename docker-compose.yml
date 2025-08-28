@@ -27,9 +27,15 @@ services:
     ports:
       - '3001:3001'
     volumes:
-      - ./auth-service:/app:ro
+      - ./auth-service:/app:delegated
+      - /app/node_modules
     env_file:
       - './auth-service/.env'
+    environment:
+      - MONGO_USERNAME=admin
+      - MONGO_PASSWORD=secret
+      - MONGO_HOST=user-db
+      - MONGO_DB=userdb
     depends_on:
       - user-db
 
@@ -40,11 +46,15 @@ services:
     ports:
       - '3002:3002'
     volumes:
-      - ./student-service:/app:ro
+      - ./student-service:/app:delegated
+      - /app/node_modules
     env_file:
       - './student-service/.env'
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
     depends_on:
-      - studentdb
+      - student-db
+      - auth
 volumes:
   user-data:
   student_data:
