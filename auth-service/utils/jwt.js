@@ -7,7 +7,7 @@ dotenv.config()
 export class JwtFacade {
   static ACCESS_TOKEN_SECRET = fs.readFileSync("private.pem", "utf8");;
   static REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-  static accessTokenExpiry = '120s';
+  static accessTokenExpiry = '1h';
   static refreshTokenExpiry = '7d';
 
   static verifyToken(token, secret, options = {}) {

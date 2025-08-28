@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 
 import router from './routes/studentRoutes.js'
 import { errorHandler } from './middleware/error-handler.js'
+import authentication from './middleware/authentication.js'
 
 const app = express();
 const PORT = 3002;
@@ -11,6 +12,8 @@ const PORT = 3002;
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('dev'));
+
+app.use(authentication);
 
 app.use('/student', router);
 
