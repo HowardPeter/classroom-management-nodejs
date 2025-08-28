@@ -1,5 +1,5 @@
 services:
-  mongodb:
+  user-db:
     image: mongo
     ports:
       - "27017:27017"
@@ -7,19 +7,54 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: secret
     volumes:
-      - user:/data/db
+      - user-data:/data/db
 
-  # auth:
-  #   build:
-  #     context: ./auth-service
-  #     target: development
-  #   ports:
-  #     - '3001:3001'
-  #   volumes:
-  #     - ./auth-service:/app:ro
-  #   env_file:
-  #     - './auth-service/.env'
-  #   depends_on:
-  #     - mongodb
+  student-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: studentdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - student_data:/var/lib/postgresql/data
+
+  auth:
+    build:
+      context: ./auth-service
+      target: development
+    ports:
+      - '3001:3001'
+    volumes:
+      - ./auth-service:/app:delegated
+      - /app/node_modules
+    env_file:
+      - './auth-service/.env'
+    environment:
+      - MONGO_USERNAME=admin
+      - MONGO_PASSWORD=secret
+      - MONGO_HOST=user-db
+      - MONGO_DB=userdb
+    depends_on:
+      - user-db
+
+  student:
+    build:
+      context: ./student-service
+      target: development
+    ports:
+      - '3002:3002'
+    volumes:
+      - ./student-service:/app:delegated
+      - /app/node_modules
+    env_file:
+      - './student-service/.env'
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
+    depends_on:
+      - student-db
+      - auth
 volumes:
-  user:
+  user-data:
+  student_data:

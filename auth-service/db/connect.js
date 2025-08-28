@@ -1,7 +1,10 @@
 import mongoose from "mongoose"
 import { InternalServerError } from "../errors/errors.js";
+import dotenv from 'dotenv'
 
-const MONGO_URL = "mongodb://admin:secret@localhost:27017/mongodb?authSource=admin"
+dotenv.config();
+
+const MONGO_URL=`mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:27017/${process.env.MONGO_DB}?authSource=admin`
 
 class DbConnect {
   static instance = null;

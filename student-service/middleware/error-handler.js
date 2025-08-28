@@ -14,7 +14,7 @@ export const errorHandler = (err, req, res, next) => {
 
   logger.error(err.stack, message);
   console.log("\n");
-  
+
   return res.status(status).json({
     success: false,
     status,
