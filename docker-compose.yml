@@ -20,6 +20,17 @@ services:
     volumes:
       - student_data:/var/lib/postgresql/data
 
+  class-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: classdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - class_data:/var/lib/postgresql/data
+
   auth:
     build:
       context: ./auth-service
@@ -55,6 +66,24 @@ services:
     depends_on:
       - student-db
       - auth
+
+  class:
+    build:
+      context: ./class-service
+      target: development
+    ports:
+      - '3002:3002'
+    volumes:
+      - ./class-service:/app:delegated
+      - /app/node_modules
+    env_file:
+      - './class-service/.env'
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@student-db:5432/classdb?schema=public
+    depends_on:
+      - class-db
+      - auth
 volumes:
   user-data:
   student_data:
+  class_data:
