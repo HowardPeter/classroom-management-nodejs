@@ -12,6 +12,22 @@ class ClassRepository extends BaseRepository {
     })
   }
 
+  async findByUserId(id) {
+    return await this.model.findMany({
+      where: {
+        userClasses: {
+          some: {
+            user_id: id
+          }
+        }
+      },
+      include: {
+        userClasses: true,
+        enrollments: true
+      }
+    });
+  }
+
   async findWithTableJoin(filter = {}, options = {}) {
     return await this.model.findMany({
       include: {

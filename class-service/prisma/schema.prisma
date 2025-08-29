@@ -17,7 +17,7 @@ datasource db {
 model Class {
   class_id        String   @id @default(uuid())
   teacher_id      String
-  name            String
+  class_name      String
   schedule        String?
   student_number  Int?
 
