@@ -20,6 +20,8 @@ services:
 
   class-db:
     image: postgres:17-alpine
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: secret
@@ -43,6 +45,7 @@ services:
       - MONGO_PASSWORD=secret
       - MONGO_HOST=user-db
       - MONGO_DB=userdb
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - user-db
 
@@ -57,6 +60,7 @@ services:
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - student-db
       - auth
@@ -72,6 +76,7 @@ services:
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - class-db
       - auth

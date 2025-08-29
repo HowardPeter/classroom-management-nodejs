@@ -21,6 +21,7 @@ class BaseRepository {
       skip: options.skip,
       take: options.take,
       orderBy: options.orderBy,
+      include: options.include || undefined
     });
   }
 

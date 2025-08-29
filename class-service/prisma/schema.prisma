@@ -16,9 +16,9 @@ datasource db {
 
 model Class {
   class_id        String   @id @default(uuid())
-  teacher_id      String
+  teacher_id      String?
   class_name      String
-  schedule        String?
+  schedule        Json?
   student_number  Int?
 
   enrollments     Enrollment[]

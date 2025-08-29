@@ -1,10 +1,10 @@
 import BaseRepository from "./BaseRepository.js";
-import prisma from '../prismaClient.js'
+import prisma from '../prismaClient.js';
 
-class EnrollmentRepository extends BaseRepository {
+class UserClassRepository extends BaseRepository {
   constructor() {
-    super(prisma.userclass);
+    super(prisma.userClass);
   }
 }
 
-export default EnrollmentRepository;
+export default new UserClassRepository();

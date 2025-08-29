@@ -1,9 +1,15 @@
-export default async function paginate(model, { page = 1, limit = 10, orderBy = { full_name: "asc" }, where = {} }) {
+export default async function paginate(repository, {
+  page = 1,
+  limit = 10,
+  orderBy,
+  where = null,
+  include = null
+} = {}) {
   const skip = (page - 1) * limit;
 
-  const data = await model.findWithTableJoin(where, { skip, limit, orderBy });
+  const data = await repository.findMany(where, { skip, take: limit, orderBy, include });
 
-  const totalItems = await model.count(where);
+  const totalItems = await repository.count(where);
   const totalPages = Math.ceil(totalItems / limit);
 
   return {

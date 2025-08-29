@@ -13,4 +13,4 @@ class EnrollmentRepository extends BaseRepository {
   // }
 }
 
-export default EnrollmentRepository;
+export default new EnrollmentRepository();
