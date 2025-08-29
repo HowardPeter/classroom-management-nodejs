@@ -22,12 +22,27 @@ model Class {
   student_number  Int?
 
   enrollments     Enrollment[]
+  userClasses     UserClass[]
 }
 
 model Enrollment {
-  enrollment_id   String   @id @default(uuid())
+  id              String   @id @default(uuid())
   student_id      String
   class_id        String
 
   class           Class    @relation(fields: [class_id], references: [class_id])
+}
+
+model UserClass {
+  id        String   @id @default(uuid())
+  class_id  String
+  user_id   String
+  role      Role
+
+  class     Class    @relation(fields: [class_id], references: [class_id])
+}
+
+enum Role {
+  owner
+  manager
 }
