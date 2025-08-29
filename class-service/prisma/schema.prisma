@@ -15,9 +15,19 @@ datasource db {
 }
 
 model Class {
+  class_id        String   @id @default(uuid())
+  teacher_id      String
+  name            String
+  schedule        String?
+  student_number  Int?
 
+  enrollments     Enrollment[]
 }
 
 model Enrollment {
-  
+  enrollment_id   String   @id @default(uuid())
+  student_id      String
+  class_id        String
+
+  class           Class    @relation(fields: [class_id], references: [class_id])
 }
