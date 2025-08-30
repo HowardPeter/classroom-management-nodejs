@@ -3,8 +3,7 @@ import morgan from 'morgan';
 import cookieParser from "cookie-parser";
 
 import router from './routes/classRoutes.js'
-import { errorHandler } from './middleware/error-handler.js'
-import authentication from './middleware/authentication.js'
+import { authentication, errorHandler } from './middleware/index.js'
 
 const app = express();
 const PORT = 3003;

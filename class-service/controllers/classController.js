@@ -1,4 +1,4 @@
-import asyncWrapper from "../middleware/assync-wrapper.js";
+import {asyncWrapper} from "../middleware/index.js";
 import ClassRepository from '../repositories/classRepository.js'
 import UserClassRepository from '../repositories/userClassRepository.js'
 import EnrollmentRepository from '../repositories/enrollmentRepository.js'
