@@ -15,7 +15,7 @@ app.use(morgan('dev'));
 
 app.use(authentication);
 
-app.use('/student', router);
+app.use('/students', router);
 
 app.use(errorHandler);
 

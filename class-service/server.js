@@ -15,7 +15,7 @@ app.use(morgan('dev'));
 
 app.use(authentication);
 
-app.use('/class', router);
+app.use('/classes', router);
 
 app.use(errorHandler);
 
