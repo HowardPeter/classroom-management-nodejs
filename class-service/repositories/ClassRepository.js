@@ -8,7 +8,11 @@ class ClassRepository extends BaseRepository {
 
   async findById(id) {
     return await this.model.findUnique({
-      where: { class_id: id }
+      where: { class_id: id },
+      include: {
+        userClasses: true,
+        enrollments: true
+      }
     })
   }
 
