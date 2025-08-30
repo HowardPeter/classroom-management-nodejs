@@ -6,11 +6,11 @@ class EnrollmentRepository extends BaseRepository {
     super(prisma.enrollment);
   }
 
-  // async findByClassId(classId) {
-  //   return await this.model.findMany({
-  //     where: { class_id: classId }
-  //   })
-  // }
+  async findByClassId(classId) {
+    return await this.model.findMany({
+      where: { class_id: classId }
+    })
+  }
 }
 
 export default new EnrollmentRepository();

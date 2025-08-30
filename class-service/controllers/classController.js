@@ -1,13 +1,14 @@
-import {asyncWrapper} from "../middleware/index.js";
+import { asyncWrapper } from "../middleware/index.js"
 import ClassRepository from '../repositories/classRepository.js'
 import UserClassRepository from '../repositories/userClassRepository.js'
 import EnrollmentRepository from '../repositories/enrollmentRepository.js'
-import { paginate, ErrorChecker } from '../utils/index.js'
+import { paginate } from '../utils/index.js'
+import { NotFoundError } from "../errors/errors.js"
 
 export const getClasses = asyncWrapper(async (req, res) => {
   const userId = req.user.userId;
 
-  ErrorChecker.notFound("User Id not found!")
+  if(!userId) throw new NotFoundError("Cannot get user Id!");
 
   const { page = 1, limit = 10, orderBy = { class_name: 'asc' } } = req.query;
 

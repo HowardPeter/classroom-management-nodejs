@@ -1,5 +1,5 @@
 import express from 'express'
-import { getStudents, getStudent, createStudent, updateStudent, deleteStudent } from '../controllers/studentController.js'
+import { getStudents, getStudent, getStudentByIds, createStudent, updateStudent, deleteStudent } from '../controllers/studentController.js'
 import { validateStudent } from '../middleware/validateStudent.js'
 
 const router = express.Router()
@@ -7,6 +7,7 @@ const router = express.Router()
 router
   .route('/')
   .get(getStudents)
+  .get(getStudentByIds)
   .post(validateStudent, createStudent)
 
 router
