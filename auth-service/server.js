@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(morgan('dev'));
 
-app.use('/auths', router);
+app.use('/auth', router);
 
 app.use(errorHandler);
 
