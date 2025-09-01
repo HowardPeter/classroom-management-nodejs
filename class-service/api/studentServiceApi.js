@@ -1,32 +1,43 @@
 import axios from "axios";
-import { InternalServerError } from "../errors/errors.js";
+import { InternalServerError, NotFoundError } from "../errors/errors.js";
 
-const URL = "http://localhost:3002";
+const URL = "http://student:3002/students";
 
 class StudentServiceClient {
   constructor(baseURL) {
     this.api = axios.create({ baseURL });
   }
 
-  async getStudentById(ids, accessToken) {
+  async getStudentByIds(ids, accessToken) {
     try {
-      const res = await this.api.get(`/students?ids=${ids}`, {
+      const res = await this.api.get(`/by-ids?ids=${ids}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return res.data;
     } catch (err) {
-      throw new InternalServerError("Failed to fetch student API!");
+      throw new InternalServerError(`Student API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+    }
+  }
+
+  async getStudentById(id, accessToken) {
+    try {
+      const res = await this.api.get(`/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      return res.data;
+    } catch (err) {
+      throw new InternalServerError(`Student API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
     }
   }
 
   async deleteStudentById(id, accessToken) {
     try {
-      const res = await this.api.delete(`/students/${id}`, {
+      const res = await this.api.delete(`/${id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       return res.data;
     } catch (err) {
-      throw new InternalServerError("Failed to delete student!");
+      throw new InternalServerError(`Student API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
     }
   }
 }

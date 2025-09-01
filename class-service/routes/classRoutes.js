@@ -19,8 +19,8 @@ router
 router
   .route('/:id/students')
   .get(getStudentsInClass)
-  .post(authorize("owner", "manager"), validate("enrollment"), addStudentToClass)
-  .patch(authorize("owner", "manager"), validate("enrollment"), changeStudentClass)
+  .post(validate("enrollment"), authorize("owner", "manager"), addStudentToClass)
+  .patch(validate("enrollment"), authorize("owner", "manager"), changeStudentClass)
 
 router
   .route('/:id/students/:studentId')

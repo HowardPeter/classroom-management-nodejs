@@ -4,7 +4,6 @@ import { BadRequestError } from "../errors/errors.js";
 const classSchema = Joi.object({
   class_name: Joi.string().required(),
   teacher_id: Joi.string().optional(),
-  student_number: Joi.number().integer().optional(),
   schedule: Joi.array().items(
     Joi.object({
       day: Joi.string().required(),
@@ -21,7 +20,7 @@ const userClassSchema = Joi.object({
 
 const enrollmentSchema = Joi.object({
   student_id: Joi.string().required(),
-  user_id: Joi.string().required(),
+  class_id: Joi.string().optional(),
 });
 
 export default function validate(type) {

@@ -19,7 +19,6 @@ model Class {
   teacher_id      String?
   class_name      String
   schedule        Json?
-  student_number  Int?
 
   enrollments     Enrollment[]
   userClasses     UserClass[]

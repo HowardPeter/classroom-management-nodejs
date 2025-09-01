@@ -7,8 +7,9 @@ const router = express.Router()
 router
   .route('/')
   .get(getStudents)
-  .get(getStudentByIds)
   .post(validateStudent, createStudent)
+
+router.get('/by-ids', getStudentByIds)
 
 router
   .route('/:id')

@@ -1,13 +1,20 @@
 import ClassRepository from '../repositories/classRepository.js'
-import UserClassRepository from '../repositories/userClassRepository.js'
 import EnrollmentRepository from '../repositories/enrollmentRepository.js'
 import { asyncWrapper } from "../middleware/index.js"
-import { paginate, getBearer } from '../utils/index.js'
+import { getBearer } from '../utils/index.js'
 import { StudentServiceClient } from '../api/index.js'
-import { NotFoundError } from "../errors/errors.js"
+import { BadRequestError, ConflictError, NotFoundError } from "../errors/errors.js"
 
 export const getStudentsInClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
+
+  const classExist = await ClassRepository.findOne({ class_id: classId });
+  if (!classExist)
+    return res.status(404).json({
+      success: false,
+      msg: "Wrong class Id! Class does not exist."
+    })
+
   const token = getBearer(req);
 
   const enrollments = await EnrollmentRepository.findByClassId(classId);
@@ -19,7 +26,7 @@ export const getStudentsInClass = asyncWrapper(async (req, res) => {
     })
 
   const ids = enrollments.map(e => e.student_id).join(",");
-  const students = await StudentServiceClient.getStudentsByIds(ids, token);
+  const students = await StudentServiceClient.getStudentByIds(ids, token);
 
   res.status(200).json({
     success: true,
@@ -29,21 +36,24 @@ export const getStudentsInClass = asyncWrapper(async (req, res) => {
 
 export const addStudentToClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Class does not exist!"
-    })
+  const token = getBearer(req);
 
   const { student_id } = req.body;
-  if (!student_id) throw new NotFoundError("Cannot get student Id!");
+  if (!student_id) throw new BadRequestError("Cannot get student Id!");
+
+  // Kiểm tra student tồn tại
+  await StudentServiceClient.getStudentById(student_id, token);
 
   const newEnrollment = {
     class_id: classId,
     student_id: student_id
   }
+
+  const hasEnrollment = await EnrollmentRepository.findOne({
+    class_id: classId,
+    student_id: student_id
+  })
+  if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 
   const result = await EnrollmentRepository.createOne(newEnrollment);
 
@@ -54,24 +64,34 @@ export const addStudentToClass = asyncWrapper(async (req, res) => {
 })
 
 export const changeStudentClass = asyncWrapper(async (req, res) => {
-  const classId = req.params.id;
-
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Class does not exist!"
-    })
+  const oldClassId = req.params.id;
 
   const { student_id, class_id } = req.body;
-  if (!student_id || !class_id) throw new NotFoundError("Require student Id and class Id!");
+  if (!student_id || !class_id) throw new BadRequestError("Require student Id and class Id!");
+
+  const token = getBearer(req);
+
+  const isClass = await ClassRepository.findOne({ class_id: class_id });
+  if (!isClass) throw new NotFoundError("Class not found!");
+
+  // Kiểm tra student tồn tại
+  await StudentServiceClient.getStudentById(student_id, token);
+
+  const hasEnrollment = await EnrollmentRepository.findOne({
+    class_id: class_id,
+    student_id: student_id
+  })
+  if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 
   const newClassRef = {
     student_id: student_id,
     class_id: class_id
   }
 
-  const result = await EnrollmentRepository.updateOne({ student_id: student_id }, newClassRef);
+  const result = await EnrollmentRepository.updateMany({
+    student_id: student_id,
+    class_id: oldClassId
+  }, newClassRef);
 
   res.status(200).json({
     success: true,
@@ -84,64 +104,28 @@ export const removeStudentFromClass = asyncWrapper(async (req, res) => {
   const studentId = req.params.studentId;
   const token = getBearer(req);
 
-  if (!studentId || classId) throw new NotFoundError("Require class id and student id!");
+  // Kiểm tra student tồn tại
+  await StudentServiceClient.getStudentById(studentId, token);
 
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Class does not exist!"
-    })
-  
-  const studentExist = await StudentServiceClient.getStudentById(studentId, token);
-  if(!studentExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Student does not exist!"
-    })
-
-  await EnrollmentRepository.deleteOne({
+  const enrollment = await EnrollmentRepository.findOne({
     student_id: studentId,
     class_id: classId
   });
 
-  await StudentServiceClient.deleteStudentById(studentId, token);
+  if (!enrollment) {
+    return res.status(404).json({
+      success: false,
+      msg: "Student is not enrolled in this class"
+    });
+  }
+
+  await EnrollmentRepository.deleteMany({
+    student_id: studentId,
+    class_id: classId
+  });
 
   res.status(200).json({
     success: true,
     msg: "Remove student from class successfully"
   });
 })
-
-// export const removeManyStudentsFromClass = asyncWrapper(async (req, res) => {
-//   const classId = req.params.id;
-
-//   const classExist = await ClassRepository.findOne({ class_id: classId });
-//   if (!classExist)
-//     return res.status(404).json({
-//       success: false,
-//       msg: "Class not found!"
-//     })
-
-//   const { student_ids } = req.body || {};
-//   if (!student_ids || student_ids.length === 0)
-//     return res.status(400).json({
-//       success: false,
-//       msg: "Student has not been chosen yet!"
-//     });
-  
-//   // Chuẩn hoá danh sách id (loại rỗng, trùng)
-//   const ids = [...new Set(student_ids.map(String).filter(Boolean))];
-
-//   const { count } = await EnrollmentRepository.deleteMany({
-//     class_id: classId,
-//     student_id: { in: ids }
-//   });
-
-//   return res.status(200).json({
-//     success: true,
-//     requested: ids.length,
-//     deleted_count: count,
-//     not_found: ids.length - count
-//   });
-// })
