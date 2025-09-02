@@ -26,7 +26,7 @@ export const getStudent = asyncWrapper(async (req, res) => {
   if (!student)
     return res.status(404).json({
       success: false,
-      msg: "Cannot update. Student not found!"
+      msg: "Student not found!"
     });
 
   res.status(200).json({
@@ -35,12 +35,34 @@ export const getStudent = asyncWrapper(async (req, res) => {
   });
 })
 
+export const getStudentByIds = asyncWrapper(async (req, res) => {
+  const ids = req.query.ids ? req.query.ids.split(",").filter(id => id.trim() !== "") : [];
+
+  if (!ids || ids.length === 0)
+    return res.status(400).json({
+      success: false,
+      msg: "Missing ids"
+    });
+
+  const { page = 1, limit = 10 } = req.query;
+
+  const students = await paginate(StudentRepository, {
+    page: Number(page),
+    limit: Number(limit),
+    where: { student_id: { in: ids } },
+    orderBy: { full_name: "asc" },
+  })
+
+  res.status(200).json({
+    success: true,
+    data: students,
+  });
+})
+
 export const createStudent = asyncWrapper(async (req, res) => {
   let newStudentData = { ...req.body };
 
-  if (!newStudentData.full_name) {
-    throw new BadRequestError("Full name is required!");
-  }
+  if (!newStudentData.full_name) throw new BadRequestError("Full name is required!");
 
   if (newStudentData.date_of_birth) newStudentData.date_of_birth = new Date(newStudentData.date_of_birth);
   if (newStudentData.enrollment_date) newStudentData.enrollment_date = new Date(newStudentData.enrollment_date);
@@ -100,3 +122,32 @@ export const deleteStudent = asyncWrapper(async (req, res) => {
     msg: "Deleting student successfully"
   });
 })
+
+// export const deleteStudents = asyncWrapper(async (req, res) => {
+//   const ids = req.query.ids ? req.query.ids.split(",") : [];
+
+//   if (!ids || ids.length === 0)
+//     return res.status(400).json({
+//       success: false,
+//       msg: "Missing ids"
+//     });
+
+//   const existingStudents = await StudentRepository.findManyByIds(ids);
+
+//   const existingIds = existingStudents.map(s => s.student_id);
+
+//   // Các id không tồn tại
+//   const notFoundIds = ids.filter(id => !existingIds.includes(id));
+
+//   // Xóa những student có tồn tại
+//   if (existingIds.length > 0) {
+//     await StudentRepository.deleteMany(existingIds);
+//   }
+
+//   res.status(200).json({
+//     success: true,
+//     msg: "Deleting students completed",
+//     deletedCount: existingIds.length,
+//     notFound: notFoundIds
+//   });
+// })

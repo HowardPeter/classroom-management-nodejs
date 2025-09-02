@@ -15,10 +15,19 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: studentdb
-    ports:
-      - "5432:5432"
     volumes:
       - student_data:/var/lib/postgresql/data
+
+  class-db:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: classdb
+    volumes:
+      - class_data:/var/lib/postgresql/data
 
   auth:
     build:
@@ -36,6 +45,7 @@ services:
       - MONGO_PASSWORD=secret
       - MONGO_HOST=user-db
       - MONGO_DB=userdb
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - user-db
 
@@ -48,13 +58,30 @@ services:
     volumes:
       - ./student-service:/app:delegated
       - /app/node_modules
-    env_file:
-      - './student-service/.env'
     environment:
       - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - student-db
       - auth
+
+  class:
+    build:
+      context: ./class-service
+      target: development
+    ports:
+      - '3003:3003'
+    volumes:
+      - ./class-service:/app:delegated
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - class-db
+      - auth
+
 volumes:
   user-data:
   student_data:
+  class_data:

@@ -1,0 +1,1 @@
+export { default as StudentServiceClient } from './studentServiceApi.js'

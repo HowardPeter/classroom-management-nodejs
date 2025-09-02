@@ -1,0 +1,31 @@
+name: 'Install & cache dependencies'
+description: 'Install the dependencies via npm and cache them'
+inputs:
+  caching:
+    description: 'Whether to cache dependencies or not.'
+    required: false
+    default: 'true'
+  context:
+    description: 'The folder path of service'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup node
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+
+    - name: Caching dependencies
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ inputs.context }}/node_modules
+        key: deps-${{ inputs.context }}-${{ runner.os }}-${{ hashFiles('${{ inputs.context }}/package-lock.json') }}
+        restore-keys: |
+          deps-${{ inputs.context }}-${{ runner.os }}-
+    
+    - name: Install dependencies
+      if: steps.cache.outputs.cache-hit != true || inputs.caching != 'true'
+      run: npm ci
+      shell: bash

@@ -1,15 +1,15 @@
 name: Action CI build
 
 on:
-  # pull_request:
-  #   branches:
-  #     - main
-  #   paths-ignore:
-  #     - '**/README.md'
-  #     - '**/.dockerignore'
-  #     - '**/.gitignore'
-  #     - '**/Dockerfile'
-  #     - '/docs/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '**/README.md'
+      - '**/.dockerignore'
+      - '**/.gitignore'
+      - '**/Dockerfile'
+      - '/docs/**'
   workflow_dispatch:
 
 jobs:
@@ -21,22 +21,40 @@ jobs:
     steps:
       - name: Get code
         uses: actions/checkout@v4
-
-      - name: Setup node
-        uses: actions/setup-node@v4
         with:
-          node-version: 22
+          path: auth-service
 
-      - name: Caching dependencies
-        id: cache
-        uses: actions/cache@v4
+      - name: Setup & cache
+        uses: ./.github/setup-deps
         with:
-          path: node_modules
-          key: deps-node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          restore-keys: |
-            deps-node-modules-${{ runner.os }}-
+          context: auth-service
       
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != true
-        run: npm ci
-        shell: bash
+  build-student:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: student-service
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup & cache
+        uses: ./.github/setup-deps
+        with:
+          context: student-service
+
+  build-class:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: class-service
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+        with:
+          path: class-service
+
+      - name: Setup & cache
+        uses: ./.github/setup-deps
+        with:
+          context: class-service

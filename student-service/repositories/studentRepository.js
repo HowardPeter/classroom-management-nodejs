@@ -21,26 +21,22 @@ class StudentRepository {
     });
   }
 
-  // Tìm theo ID (UUID)
   async findById(id) {
     return await this.prisma.student.findUnique({
       where: { student_id: id },
     });
   }
 
-  // Tìm một student với filter
   async findOne(filter = {}) {
     return await this.prisma.student.findFirst({
       where: filter,
     });
   }
 
-  // Tạo mới
   async createOne(data) {
     return await this.prisma.student.create({ data: data });
   }
 
-  // Cập nhật theo ID
   async updateById(id, data) {
     return await this.prisma.student.update({
       where: { student_id: id },
@@ -48,10 +44,15 @@ class StudentRepository {
     });
   }
 
-  // Xoá theo ID
   async deleteById(id) {
     return await this.prisma.student.delete({
       where: { student_id: id },
+    });
+  }
+
+  async deleteMany(ids) {
+    return await this.prisma.student.delete({
+      where: { student_id: { in: ids } },
     });
   }
 }
