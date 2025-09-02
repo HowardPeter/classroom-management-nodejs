@@ -66,32 +66,27 @@ export const addStudentToClass = asyncWrapper(async (req, res) => {
 export const changeStudentClass = asyncWrapper(async (req, res) => {
   const oldClassId = req.params.id;
 
-  const { student_id, class_id } = req.body;
-  if (!student_id || !class_id) throw new BadRequestError("Require student Id and class Id!");
+  const { student_id, class_id: newClassId } = req.body;
+  if (!student_id || !newClassId) throw new BadRequestError("Require student Id and class Id!");
 
   const token = getBearer(req);
 
-  const isClass = await ClassRepository.findOne({ class_id: class_id });
+  const isClass = await ClassRepository.findOne({ class_id: newClassId });
   if (!isClass) throw new NotFoundError("Class not found!");
 
   // Kiểm tra student tồn tại
   await StudentServiceClient.getStudentById(student_id, token);
 
   const hasEnrollment = await EnrollmentRepository.findOne({
-    class_id: class_id,
+    class_id: newClassId,
     student_id: student_id
   })
   if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 
-  const newClassRef = {
-    student_id: student_id,
-    class_id: class_id
-  }
-
   const result = await EnrollmentRepository.updateMany({
     student_id: student_id,
     class_id: oldClassId
-  }, newClassRef);
+  }, { class_id: newClassId });
 
   res.status(200).json({
     success: true,

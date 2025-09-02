@@ -1,7 +1,8 @@
 import express from 'express'
+import { authorize, validate } from '../middleware/index.js'
 import { getClasses, getClass, createNewClass, updateClass, deleteClass } from '../controllers/classController.js'
 import { getStudentsInClass, addStudentToClass, changeStudentClass, removeStudentFromClass } from '../controllers/enrollmentController.js'
-import { authorize, validate } from '../middleware/index.js'
+import { getUserClasses, addUserClass, joinClass, changeUserClass, removeUserClass } from '../controllers/userClassController.js'
 
 const router = express.Router()
 
@@ -25,5 +26,17 @@ router
 router
   .route('/:id/students/:studentId')
   .delete(authorize("owner", "manager"), removeStudentFromClass)
+
+router
+  .route('/:id/users')
+  .get(validate("owner", "manager"), getUserClasses)
+  .post(validate("owner"), addUserClass)
+
+router
+  .route('/:id/users/:userId')
+  .patch(validate("owner"), changeUserClass)
+  .delete(validate("owner"), removeUserClass)
+
+router.post('/join', joinClass)
 
 export default router;
