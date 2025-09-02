@@ -12,15 +12,15 @@ const classSchema = Joi.object({
   ).optional()
 });
 
-const userClassSchema = Joi.object({
-  class_id: Joi.string().required(),
-  user_id: Joi.string().required(),
-  role: Joi.string().valid("owner", "manager").required(),
-});
-
 const enrollmentSchema = Joi.object({
   student_id: Joi.string().required(),
   class_id: Joi.string().optional(),
+});
+
+const userClassSchema = Joi.object({
+  class_id: Joi.string().optional(),
+  user_id: Joi.string().required(),
+  role: Joi.string().valid("owner", "manager").required(),
 });
 
 export default function validate(type) {

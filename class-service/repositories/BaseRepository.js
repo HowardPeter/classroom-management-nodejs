@@ -25,27 +25,20 @@ class BaseRepository {
     });
   }
 
-  async createOne(data) {
-    return await this.model.create({ data: data });
+  async findByClassId(classId) {
+    return await this.model.findMany({
+      where: { class_id: classId }
+    })
   }
 
-  async updateOne(filter = {}, data) {
-    return await this.model.update({
-      where: filter,
-      data: data,
-    });
+  async createOne(data) {
+    return await this.model.create({ data: data });
   }
 
   async updateMany(filter = {}, data) {
     return await this.model.updateMany({
       where: filter,
       data: data,
-    });
-  }
-
-  async deleteOne(filter = {}) {
-    return await this.model.delete({
-      where: filter,
     });
   }
 

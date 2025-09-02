@@ -4,10 +4,9 @@ CREATE TYPE "public"."Role" AS ENUM ('owner', 'manager');
 -- CreateTable
 CREATE TABLE "public"."Class" (
     "class_id" TEXT NOT NULL,
-    "teacher_id" TEXT NOT NULL,
+    "teacher_id" TEXT,
     "class_name" TEXT NOT NULL,
-    "schedule" TEXT,
-    "student_number" INTEGER,
+    "schedule" JSONB,
 
     CONSTRAINT "Class_pkey" PRIMARY KEY ("class_id")
 );

@@ -123,3 +123,17 @@ export const logout = asyncWrapper(async (req, res) => {
 
   res.status(200).json({ msg: "Logout successfully" });
 })
+
+export const getUsernameByIds = asyncWrapper(async (req, res) => {
+  const ids = req.query.ids ? req.query.ids.split(",").filter(id => id.trim() !== "") : [];
+
+  if (!ids || ids.length === 0)
+    return res.status(400).json({
+      success: false,
+      msg: "Missing ids"
+    });
+
+  const users = await UserRepository.findNameByIds(ids);
+
+  res.status(200).json(users);
+})

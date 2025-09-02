@@ -3,10 +3,6 @@ class BaseRepository {
     this.model = model;
   }
 
-  async findAll(filter = {}, options = {}) {
-    return await this.model.find(filter, null, options);
-  }
-
   async findById(id) {
     return await this.model.findById(id);
   }
