@@ -1,6 +1,6 @@
 import { checkPermission } from '../utils/index.js'
 
-export const authorize = (allowedRoles) => {
+export const authorize = (...allowedRoles) => {
   return async (req, res, next) => {
     try {
       const classId = req.params.id;

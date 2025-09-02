@@ -7,7 +7,6 @@ import { BadRequestError, ConflictError, NotFoundError } from "../errors/errors.
 
 export const getStudentsInClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-
   const classExist = await ClassRepository.findOne({ class_id: classId });
   if (!classExist)
     return res.status(404).json({
@@ -36,6 +35,13 @@ export const getStudentsInClass = asyncWrapper(async (req, res) => {
 
 export const addStudentToClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
+  const classExist = await ClassRepository.findOne({ class_id: classId });
+  if (!classExist)
+    return res.status(404).json({
+      success: false,
+      msg: "Wrong class Id! Class does not exist."
+    })
+
   const token = getBearer(req);
 
   const { student_id } = req.body;
@@ -65,9 +71,16 @@ export const addStudentToClass = asyncWrapper(async (req, res) => {
 
 export const changeStudentClass = asyncWrapper(async (req, res) => {
   const oldClassId = req.params.id;
+  const classExist = await ClassRepository.findOne({ class_id: oldClassId });
+  if (!classExist)
+    return res.status(404).json({
+      success: false,
+      msg: "Wrong class Id! Class does not exist."
+    })
 
-  const { student_id, class_id: newClassId } = req.body;
-  if (!student_id || !newClassId) throw new BadRequestError("Require student Id and class Id!");
+  const studentId = req.params.studentId;
+  const { class_id: newClassId } = req.body;
+  if (!newClassId) throw new BadRequestError("Require new class Id!");
 
   const token = getBearer(req);
 
@@ -75,16 +88,16 @@ export const changeStudentClass = asyncWrapper(async (req, res) => {
   if (!isClass) throw new NotFoundError("Class not found!");
 
   // Kiểm tra student tồn tại
-  await StudentServiceClient.getStudentById(student_id, token);
+  await StudentServiceClient.getStudentById(studentId, token);
 
   const hasEnrollment = await EnrollmentRepository.findOne({
     class_id: newClassId,
-    student_id: student_id
+    student_id: studentId
   })
   if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 
   const result = await EnrollmentRepository.updateMany({
-    student_id: student_id,
+    student_id: studentId,
     class_id: oldClassId
   }, { class_id: newClassId });
 
@@ -96,6 +109,13 @@ export const changeStudentClass = asyncWrapper(async (req, res) => {
 
 export const removeStudentFromClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
+  const classExist = await ClassRepository.findOne({ class_id: classId });
+  if (!classExist)
+    return res.status(404).json({
+      success: false,
+      msg: "Wrong class Id! Class does not exist."
+    })
+
   const studentId = req.params.studentId;
   const token = getBearer(req);
 
