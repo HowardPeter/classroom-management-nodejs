@@ -15,25 +15,17 @@ on:
 jobs:
   build-auth:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: auth-service
     steps:
       - name: Get code
         uses: actions/checkout@v4
-        with:
-          path: auth-service
 
       - name: Setup & cache
         uses: ./.github/setup-deps
         with:
-          context: auth-service
+          context: ./auth-service
       
   build-student:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: student-service
     steps:
       - name: Get code
         uses: actions/checkout@v4
@@ -41,20 +33,15 @@ jobs:
       - name: Setup & cache
         uses: ./.github/setup-deps
         with:
-          context: student-service
+          context: ./student-service
 
   build-class:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: class-service
     steps:
       - name: Get code
         uses: actions/checkout@v4
-        with:
-          path: class-service
 
       - name: Setup & cache
         uses: ./.github/setup-deps
         with:
-          context: class-service
+          context: ./class-service
