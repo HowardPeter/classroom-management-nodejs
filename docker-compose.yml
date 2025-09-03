@@ -31,12 +31,14 @@ services:
 
   auth:
     build:
-      context: ./auth-service
+      context: .
+      dockerfile: auth-service/Dockerfile
       target: development
     ports:
       - '3001:3001'
     volumes:
       - ./auth-service:/app:delegated
+      - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     env_file:
       - './auth-service/.env'
@@ -51,12 +53,14 @@ services:
 
   student:
     build:
-      context: ./student-service
+      context: .
+      dockerfile: student-service/Dockerfile
       target: development
     ports:
       - '3002:3002'
     volumes:
       - ./student-service:/app:delegated
+      - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
