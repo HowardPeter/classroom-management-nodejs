@@ -58,15 +58,21 @@ export const createNewClass = asyncWrapper(async (req, res) => {
   const result = await ClassRepository.createOne(newClassData);
 
   const classId = result.class_id;
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
 
-  const newUserRef = {
-    class_id: classId,
-    user_id: userId,
-    role: "owner"
+  if (!userId) throw new NotFoundError("Cannot get user Id!");
+
+  try {
+    await UserClassRepository.createOne({
+      class_id: result.class_id,
+      user_id: userId,
+      role: "owner"
+    });
+  } catch (err) {
+    // rollback class nếu lỗi khi insert userClass
+    await ClassRepository.deleteById(result.class_id);
+    throw err;
   }
-
-  await UserClassRepository.createOne(newUserRef);
 
   res.status(201).json({
     success: true,
@@ -78,9 +84,13 @@ export const updateClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
   const updateData = req.body;
 
-  const updatedClass = await ClassRepository.findById(classId);
+  if (!updateData || Object.keys(updateData).length === 0) {
+    throw new BadRequestError("No update data provided!");
+  }
 
-  if (!updatedClass)
+  const isClassExist = await ClassRepository.findById(classId);
+
+  if (!isClassExist)
     return res.status(404).json({
       success: false,
       msg: "Class not found. Check the Id again!"
@@ -97,16 +107,18 @@ export const updateClass = asyncWrapper(async (req, res) => {
 export const deleteClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
 
-  const deletedClass = await ClassRepository.findById(classId);
+  const isClassExist = await ClassRepository.findById(classId);
 
-  if (!deletedClass)
+  if (!isClassExist)
     return res.status(404).json({
       success: false,
       msg: "Class not found. Check the Id again!"
     })
 
+  // Xóa record liên quan
   await EnrollmentRepository.deleteMany({ class_id: classId });
   await UserClassRepository.deleteMany({ class_id: classId });
+
   await ClassRepository.deleteById(classId);
 
   res.status(200).json({

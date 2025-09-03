@@ -145,7 +145,8 @@ export const joinClass = asyncWrapper(async (req, res) => {
       msg: "Wrong class Id! Class does not exist."
     })
 
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
+  if (!userId) throw new NotFoundError("Cannot get user Id!");
 
   const hasUser = await UserClassRepository.findOne({
     class_id: classId,
@@ -175,6 +176,7 @@ export const leaveClass = asyncWrapper(async (req, res) => {
     })
 
   const userId = req.user.userId;
+  if (!userId) throw new NotFoundError("Cannot get user Id!");
 
   await UserClassRepository.deleteMany({
     class_id: class_id,
