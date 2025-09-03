@@ -1,5 +1,5 @@
 import axios from "axios";
-import { InternalServerError, NotFoundError } from "../errors/errors.js";
+import { InternalServerError } from "#shared/errors/errors.js";
 
 const URL = "http://student:3002/students";
 

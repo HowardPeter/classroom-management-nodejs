@@ -13,7 +13,7 @@ export const errorHandler = (err, req, res, next) => {
   const message = err.message || "Something went wrong!";
 
   logger.error(err.stack, message);
-  console.log("\n");
+  console.log("");
 
   return res.status(status).json({
     success: false,

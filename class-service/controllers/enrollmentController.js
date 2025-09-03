@@ -1,9 +1,9 @@
 import ClassRepository from '../repositories/classRepository.js'
 import EnrollmentRepository from '../repositories/enrollmentRepository.js'
-import { asyncWrapper } from "../middleware/index.js"
+import { asyncWrapper } from "#shared/middlewares/index.js"
 import { getBearer } from '../utils/index.js'
 import { StudentServiceClient } from '../api/index.js'
-import { BadRequestError, ConflictError, NotFoundError } from "../errors/errors.js"
+import { BadRequestError, ConflictError, NotFoundError } from "#shared/errors/errors.js"
 
 export const getStudentsInClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;

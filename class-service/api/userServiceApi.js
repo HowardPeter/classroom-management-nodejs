@@ -1,7 +1,7 @@
 import axios from "axios";
-import { InternalServerError } from "../errors/errors.js";
+import { InternalServerError } from "#shared/errors/errors.js";
 
-const URL = "http://host.docker.internal:3001/users"
+const URL = "http://auth:3001/users"
 
 class UserServiceClient {
   constructor(baseURL) {

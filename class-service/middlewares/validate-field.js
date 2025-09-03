@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { BadRequestError } from "../errors/errors.js";
+import { BadRequestError } from "#shared/errors/errors.js";
 
 const classSchema = Joi.object({
   class_name: Joi.string().required(),
