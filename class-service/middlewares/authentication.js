@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { UnauthorizedError } from '../errors/errors.js';
+import { UnauthorizedError } from '#shared/errors/errors.js';
 import fs from 'fs';
 
 export default function authentication(req, res, next) {

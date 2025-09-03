@@ -1,5 +1,5 @@
 import express from 'express'
-import { authorize, validate } from '../middleware/index.js'
+import { authorize, validate } from '../middlewares/index.js'
 import { getClasses, getClass, createNewClass, updateClass, deleteClass } from '../controllers/classController.js'
 import { getStudentsInClass, addStudentToClass, changeStudentClass, removeStudentFromClass } from '../controllers/enrollmentController.js'
 import { getUserClasses, addUserClass, joinClass, changeUserClass, removeUserClass, leaveClass } from '../controllers/userClassController.js'
