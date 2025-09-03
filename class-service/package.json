@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "imports": {
+    "#shared/*": "./shared-libs/*"
+  },
   "dependencies": {
     "@prisma/client": "^6.15.0",
     "axios": "^1.11.0",

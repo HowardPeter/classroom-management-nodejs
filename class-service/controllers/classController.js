@@ -3,7 +3,7 @@ import UserClassRepository from '../repositories/userClassRepository.js'
 import EnrollmentRepository from '../repositories/enrollmentRepository.js'
 import { asyncWrapper } from "../middleware/index.js"
 import { paginate } from '../utils/index.js'
-import { NotFoundError } from "../errors/errors.js"
+import { BadRequestError, NotFoundError } from "#shared/errors/errors.js"
 
 export const getClasses = asyncWrapper(async (req, res) => {
   const userId = req.user.userId;

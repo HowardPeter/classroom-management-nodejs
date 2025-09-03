@@ -3,7 +3,7 @@ import UserClassRepository from '../repositories/userClassRepository.js'
 import { asyncWrapper } from "../middleware/index.js"
 import { getBearer } from '../utils/index.js'
 import { UserServiceClient } from '../api/index.js'
-import { BadRequestError, ConflictError, NotFoundError } from "../errors/errors.js"
+import { BadRequestError, ConflictError, NotFoundError } from "#shared/errors/errors.js"
 
 export const getUserClasses = asyncWrapper(async (req, res) => {
   const classId = req.params.id;

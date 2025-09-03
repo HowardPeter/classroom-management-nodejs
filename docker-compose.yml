@@ -67,12 +67,14 @@ services:
 
   class:
     build:
-      context: ./class-service
+      context: .
+      dockerfile: class-service/Dockerfile
       target: development
     ports:
       - '3003:3003'
     volumes:
       - ./class-service:/app:delegated
+      - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
