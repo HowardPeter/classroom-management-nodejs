@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser"
 
 import router from './routes/authRoutes.js'
 import DbConnect from './db/connect.js'
-import { errorHandler } from './middleware/error-handler.js'
+import { errorHandler } from '#shared/middlewares/error-handler.js'
 
 const app = express();
 const PORT = 3001;

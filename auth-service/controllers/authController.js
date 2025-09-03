@@ -3,8 +3,8 @@ import bcrypt from 'bcrypt'
 
 import TokenRepository from "../repositories/tokenRepository.js";
 import UserRepository from '../repositories/userRepository.js';
-import asyncWrapper from "../middleware/assync-wrapper.js";
-import { BadRequestError, ConflictError, NotFoundError, UnauthorizedError, InternalServerError } from "../errors/errors.js";
+import { asyncWrapper } from "#shared/middlewares/index.js"
+import { BadRequestError, ConflictError, NotFoundError, UnauthorizedError, InternalServerError } from "#shared/errors/errors.js";
 import { JwtFacade } from '../utils/jwt.js';
 import createHash from '../utils/createHash.js';
 

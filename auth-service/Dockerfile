@@ -23,7 +23,7 @@ RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nodeusr
 USER nodeusr
 
-COPY class-service/ .
+COPY auth-service/ .
 COPY shared-libs ./shared-libs
 
 ENV NODE_ENV=production

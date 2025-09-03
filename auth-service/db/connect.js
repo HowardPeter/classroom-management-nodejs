@@ -1,5 +1,5 @@
 import mongoose from "mongoose"
-import { InternalServerError } from "../errors/errors.js";
+import { InternalServerError } from "#shared/errors/errors.js";
 import dotenv from 'dotenv'
 
 dotenv.config();

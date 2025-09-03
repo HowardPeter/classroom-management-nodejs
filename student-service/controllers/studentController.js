@@ -1,7 +1,7 @@
-import asyncWrapper from "../middleware/assync-wrapper.js";
 import StudentRepository from "../repositories/studentRepository.js";
-import paginate from '../utils/pagination.js'
-import { BadRequestError, ConflictError, NotFoundError } from "../errors/errors.js";
+import { asyncWrapper } from "#shared/middlewares/index.js"
+import { paginate } from '#shared/utils/index.js'
+import { BadRequestError, ConflictError } from "#shared/errors/errors.js";
 
 export const getStudents = asyncWrapper(async (req, res) => {
   const { page = 1, limit = 10, ...filters } = req.query;
