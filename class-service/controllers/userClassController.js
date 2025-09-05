@@ -1,7 +1,7 @@
 import ClassRepository from '../repositories/classRepository.js'
 import UserClassRepository from '../repositories/userClassRepository.js'
 import { asyncWrapper } from "#shared/middlewares/index.js"
-import { getBearer } from '../utils/index.js'
+import { getBearer } from '#shared/utils/index.js'
 import { UserServiceClient } from '../api/index.js'
 import { BadRequestError, ConflictError, NotFoundError } from "#shared/errors/errors.js"
 

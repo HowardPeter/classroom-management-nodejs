@@ -1,7 +1,7 @@
 import ClassRepository from '../repositories/classRepository.js'
 import EnrollmentRepository from '../repositories/enrollmentRepository.js'
 import { asyncWrapper } from "#shared/middlewares/index.js"
-import { getBearer } from '../utils/index.js'
+import { getBearer } from '#shared/utils/index.js'
 import { StudentServiceClient } from '../api/index.js'
 import { BadRequestError, ConflictError, NotFoundError } from "#shared/errors/errors.js"
 
