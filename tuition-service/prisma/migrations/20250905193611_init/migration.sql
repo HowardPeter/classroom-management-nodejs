@@ -10,6 +10,7 @@ CREATE TABLE "public"."Invoice" (
     "student_id" TEXT NOT NULL,
     "class_id" TEXT NOT NULL,
     "description" TEXT,
+    "required_amount" DECIMAL(65,30) NOT NULL,
     "due_date" TIMESTAMP(3),
     "status" "public"."InvoiceStatus" DEFAULT 'PENDING',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

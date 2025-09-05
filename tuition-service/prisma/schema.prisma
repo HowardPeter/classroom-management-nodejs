@@ -15,16 +15,17 @@ datasource db {
 }
 
 model Invoice {
-  invoice_id String        @id @default(uuid())
-  student_id String
-  class_id   String
+  invoice_id       String        @id @default(uuid())
+  student_id       String
+  class_id         String
 
-  description String?
-  due_date   DateTime?
-  status     InvoiceStatus? @default(PENDING)
-  created_at DateTime       @default(now())
+  description      String?
+  required_amount  Decimal
+  due_date         DateTime?
+  status           InvoiceStatus? @default(PENDING)
+  created_at       DateTime       @default(now())
 
-  payments   Payment[]
+  payments         Payment[]
 }
 
 model Payment {
