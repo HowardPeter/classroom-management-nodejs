@@ -19,10 +19,10 @@ model Invoice {
   student_id String
   class_id   String
 
-  amount     Decimal
-  due_date   DateTime
-  status     InvoiceStatus @default(PENDING)
-  created_at DateTime      @default(now())
+  description String?
+  due_date   DateTime?
+  status     InvoiceStatus? @default(PENDING)
+  created_at DateTime       @default(now())
 
   payments   Payment[]
 }
@@ -31,7 +31,7 @@ model Payment {
   payment_id String        @id @default(uuid())
   invoice_id String
   amount     Decimal
-  method     PaymentMethod
+  method     PaymentMethod?
   paid_at    DateTime      @default(now())
 
   invoice    Invoice       @relation(fields: [invoice_id], references: [invoice_id], onDelete: Cascade)
