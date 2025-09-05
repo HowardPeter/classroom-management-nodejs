@@ -2,15 +2,16 @@ import Joi from "joi";
 import { BadRequestError } from "#shared/errors/errors.js";
 
 const invoiceSchema = Joi.object({
+  student_id: Joi.string().required(),
   description: Joi.string().optional(),
-  required_amount: Joi.decimal().required(),
+  required_amount: Joi.number().required(),
   due_date: Joi.date().optional(),
   status: Joi.string().optional(),
   created_at: Joi.date().optional(),
 });
 
 const paymentSchema = Joi.object({
-  amount: Joi.decimal().required(),
+  amount: Joi.number().required(),
   method: Joi.string().optional(),
   paid_at: Joi.date().optional(),
 });
@@ -32,9 +33,9 @@ export default function validate(type) {
         return next(new BadRequestError("Wrong validate model name!"));
     }
 
-    const { error } = schema.validate(req.body, { abortEarly: false });
+    const { error } = schema.validate(req.body);
     if (error) {
-      return next(new BadRequestError(error.details[0].message));
+      return next(new BadRequestError("Validate failed: ", error.details[0].message));
     }
 
     next();

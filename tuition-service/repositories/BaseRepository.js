@@ -3,6 +3,12 @@ class BaseRepository {
     this.model = model;
   }
 
+  async count(filter = {}) {
+    return await this.model.count({
+      where: filter,
+    });
+  }
+  
   async findOne(filter = {}, options = {}) {
     return await this.model.findFirst({
       where: filter,

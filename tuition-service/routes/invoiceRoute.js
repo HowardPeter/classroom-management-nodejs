@@ -1,19 +1,20 @@
 import express from 'express'
-import { getInvoices, getInvoice, getOverdueInvoice, createInvoice, updateInvoice, deleteInvoice } from '../controllers/invoiceController.js'
+import { getInvoices, getInvoice, createInvoice, updateInvoice, cancelInvoice, deleteInvoice } from '../controllers/invoiceController.js'
+import { validate } from '../middlewares/index.js'
 
 const router = express.Router();
 
 router
   .route('/')
   .get(getInvoices)
-  .post(createInvoice)
+  .post(validate("invoice"), createInvoice)
 
 router
   .route('/:id')
   .get(getInvoice)
-  .patch(updateInvoice)
+  .patch(validate("invoice"), updateInvoice)
   .delete(deleteInvoice)
 
-router.get('/overdue', getOverdueInvoice)
+router.patch(':id/cancel', validate("invoice"), cancelInvoice)
 
 export default router;
