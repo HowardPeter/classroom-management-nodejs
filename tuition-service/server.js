@@ -2,7 +2,8 @@ import express from 'express'
 import morgan from 'morgan';
 import cookieParser from "cookie-parser";
 
-import router from './routes/invoiceRoute.js';
+import invoiceRouter from './routes/invoiceRoute.js';
+import paymentRouter from './routes/paymentRoute.js';
 import { authentication } from './middlewares/index.js'
 import { errorHandler } from '#shared/middlewares/index.js';
 
@@ -15,7 +16,8 @@ app.use(morgan('dev'));
 
 app.use(authentication);
 
-app.use('/tuition/invoices', router)
+app.use('/tuition/invoices', invoiceRouter);
+app.use('/tuition/payments', paymentRouter);
 
 app.use(errorHandler);
 

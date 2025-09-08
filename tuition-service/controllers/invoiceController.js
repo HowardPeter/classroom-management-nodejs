@@ -3,14 +3,16 @@ import { paginate, getBearer } from '#shared/utils/index.js'
 import { NotFoundError, BadRequestError, ConflictError } from "#shared/errors/errors.js"
 import InvoiceRepository from '../repositories/invoiceRepository.js'
 import { ClassServiceClient, StudentServiceClient } from '../api/index.js'
+import { normalizeFilter } from '../utils/index.js'
 
+// GET /tuition/invoices/?class_id=
 // Tìm invoice trong class theo class id và filter (nếu có)
 export const getInvoices = asyncWrapper(async (req, res) => {
-  const { page = 1, limit = 10, orderBy = { created_at: "asc" }, class_id: classId, ...filter } = req.query;
+  const { page = 1, limit = 10, orderBy = { created_at: "asc" }, class_id: classId, ...rawFilter } = req.query;
 
   if (!classId) throw new BadRequestError("Class Id is required!");
 
-  if (filter.status) filter.status = filter.status.toUpperCase();
+  const filter = normalizeFilter(rawFilter);
 
   // Kiểm tra class tồn tại
   const token = getBearer(req);
@@ -32,6 +34,7 @@ export const getInvoices = asyncWrapper(async (req, res) => {
   });
 })
 
+// GET /tuition/invoices/:id?class_id=
 // Tìm 1 invoice trong class
 export const getInvoice = asyncWrapper(async (req, res) => {
   const { class_id: classId } = req.query;
@@ -44,11 +47,7 @@ export const getInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
   const invoice = await InvoiceRepository.findById(invoiceId);
 
-  if (!invoice)
-    return res.status(404).json({
-      success: false,
-      msg: "Invoice not found!"
-    })
+  if (!invoice) throw new NotFoundError("Invoice not found!");
 
   res.status(200).json({
     success: true,
@@ -56,11 +55,13 @@ export const getInvoice = asyncWrapper(async (req, res) => {
   });
 })
 
+// POST /tuition/invoices/?class_id=
 // Tạo invoice mới
 export const createInvoice = asyncWrapper(async (req, res) => {
   const invoiceData = req.body;
 
   if (invoiceData.due_date) invoiceData.due_date = new Date(invoiceData.due_date);
+  if (invoiceData.status) invoiceData.status = invoiceData.status.toUpperCase();
 
   const classId = req.query.class_id || req.body.class_id;
   if (!classId) throw new BadRequestError("Class Id is required!");
@@ -83,18 +84,18 @@ export const createInvoice = asyncWrapper(async (req, res) => {
   });
 })
 
+// PATCH /tuition/invoices/:id?class_id=
 // Cập nhật invoice
 export const updateInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
 
   const isInvoiceExist = await InvoiceRepository.findById(invoiceId);
-  if (!isInvoiceExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Invoice not found!"
-    })
+  if (!isInvoiceExist) throw new NotFoundError("Invoice not found!");
 
   const updateData = req.body;
+
+  if (updateData.due_date) updateData.due_date = new Date(updateData.due_date);
+  if (updateData.status) updateData.status = updateData.status.toUpperCase();
 
   if (!updateData || Object.keys(updateData).length === 0)
     throw new BadRequestError("No update data provided!");
@@ -107,25 +108,16 @@ export const updateInvoice = asyncWrapper(async (req, res) => {
   });
 })
 
+// PATCH /tuition/invoices/:id?class_id=
 // Hủy invoice (không xóa mà chỉ update status = CANCELLED)
 export const cancelInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
 
   const invoice = await InvoiceRepository.findById(invoiceId);
-  if (!invoice) {
-    return res.status(404).json({
-      success: false,
-      msg: "Invoice not found!"
-    });
-  }
+  if (!invoice) throw new NotFoundError("Invoice not found!");
 
   // Nếu invoice đã trả đủ thì không cho hủy
-  if (invoice.status === "PAID") {
-    return res.status(400).json({
-      success: false,
-      msg: "Cannot cancel an invoice that is fully paid!"
-    });
-  }
+  if (invoice.status === "PAID") throw new ConflictError("Cannot cancel an invoice that is fully paid!");
 
   const cancelledInvoice = await InvoiceRepository.updateById(invoiceId, {
     status: "CANCELLED"
@@ -138,16 +130,13 @@ export const cancelInvoice = asyncWrapper(async (req, res) => {
   });
 });
 
+// DELETE /tuition/invoices/:id?class_id=
 // Xóa invoice (chỉ dành cho môi trường dev)
 export const deleteInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
 
   const isInvoiceExist = await InvoiceRepository.findById(invoiceId);
-  if (!isInvoiceExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Invoice not found!"
-    })
+  if (!isInvoiceExist) throw new NotFoundError("Invoice not found!");
 
   // Xóa invoice và payments (prisma 'onDelete: Cascade')
   await InvoiceRepository.deleteById(invoiceId);

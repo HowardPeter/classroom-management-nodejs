@@ -6,8 +6,8 @@ const invoiceSchema = Joi.object({
   description: Joi.string().optional(),
   required_amount: Joi.number().required(),
   due_date: Joi.date().optional(),
-  status: Joi.string().optional(),
-  created_at: Joi.date().optional(),
+  status: Joi.forbidden(),
+  created_at: Joi.forbidden(),
 });
 
 const paymentSchema = Joi.object({

@@ -13,6 +13,14 @@ class PaymentRepository extends BaseRepository {
     });
   }
 
+  async sumByInvoice(invoiceId) {
+    const result = await this.model.aggregate({
+      _sum: { amount: true },
+      where: { invoice_id: invoiceId },
+    });
+    return result._sum.amount || 0; // nếu chưa có payment thì trả về 0
+  }
+
   async updateById(id, data) {
     return await super.updateById("payment_id", id, data);
   }
