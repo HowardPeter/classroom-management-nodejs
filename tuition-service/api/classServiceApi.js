@@ -18,6 +18,17 @@ class ClassServiceClient {
       throw new InternalServerError(`Class API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
     }
   }
+
+  async getUserClass(classId, userId, accessToken) {
+    try {
+      const res = await this.api.get(`/${classId}/permissions?user_id=${userId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+      return res.data;
+    } catch (err) {
+      throw new InternalServerError(`Class API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+    }
+  }
 }
 
 export default new ClassServiceClient(URL);

@@ -66,7 +66,6 @@ export const getClassMonthlyTuitionReport = asyncWrapper(async (req, res) => {
   res.status(200).json({
     class_id: classId,
     month,
-    monthInvoices,
     summary: {
       total_expected: expectedTotal,
       total_paid: paidTotal,
@@ -93,8 +92,15 @@ export const getStudentTuitionReport = asyncWrapper(async (req, res) => {
     include: { payments: true }
   });
 
-  // Lấy danh sách lớp học sinh tham gia
-  // const studentClass = await ClassServiceClient.getClassByStudentIds
+  // Phân loại invoice theo class
+  const groupedInvoices = studentInvoices.reduce((groups, invoice) => {
+    const key = invoice.class_id;
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(invoice);
+    return groups;
+  }, {});
 
   // Tổng số invoice
   const totalInvoice = studentInvoices.length;
@@ -126,6 +132,7 @@ export const getStudentTuitionReport = asyncWrapper(async (req, res) => {
   res.status(200).json({
     student,
     summary: {
+      total_invoice: totalInvoice,
       total_expected: expectedTotal,
       total_paid: paidTotal,
       total_unpaid: unpaidTotal,
@@ -134,6 +141,6 @@ export const getStudentTuitionReport = asyncWrapper(async (req, res) => {
         upcoming_debt: upcomingDebt
       },
     },
-    invoices: studentInvoices
+    invoices: groupedInvoices
   })
 })

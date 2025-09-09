@@ -5,7 +5,7 @@ import InvoiceRepository from '../repositories/invoiceRepository.js'
 import { ClassServiceClient, StudentServiceClient } from '../api/index.js'
 import { normalizeFilter } from '../utils/index.js'
 
-// GET /tuition/invoices/?class_id=
+// GET /tuition/invoices/?class_id=xxx
 // Tìm invoice trong class theo class id và filter (nếu có)
 export const getInvoices = asyncWrapper(async (req, res) => {
   const { page = 1, limit = 10, orderBy = { created_at: "asc" }, class_id: classId, ...rawFilter } = req.query;
@@ -13,10 +13,6 @@ export const getInvoices = asyncWrapper(async (req, res) => {
   if (!classId) throw new BadRequestError("Class Id is required!");
 
   const filter = normalizeFilter(rawFilter);
-
-  // Kiểm tra class tồn tại
-  const token = getBearer(req);
-  await ClassServiceClient.getClassById(classId, token);
 
   const invoices = await paginate(InvoiceRepository, ({
     page: Number(page),
@@ -34,16 +30,9 @@ export const getInvoices = asyncWrapper(async (req, res) => {
   });
 })
 
-// GET /tuition/invoices/:id?class_id=
+// GET /tuition/invoices/:id?class_id=xxx
 // Tìm 1 invoice trong class
 export const getInvoice = asyncWrapper(async (req, res) => {
-  const { class_id: classId } = req.query;
-  if (!classId) throw new BadRequestError("Class Id is required!");
-
-  // Kiểm tra class tồn tại
-  const token = getBearer(req);
-  await ClassServiceClient.getClassById(classId, token);
-
   const { id: invoiceId } = req.params;
   const invoice = await InvoiceRepository.findById(invoiceId);
 
@@ -55,20 +44,13 @@ export const getInvoice = asyncWrapper(async (req, res) => {
   });
 })
 
-// POST /tuition/invoices/?class_id=
+// POST /tuition/invoices/?class_id=xxx
 // Tạo invoice mới
 export const createInvoice = asyncWrapper(async (req, res) => {
   const invoiceData = req.body;
 
   if (invoiceData.due_date) invoiceData.due_date = new Date(invoiceData.due_date);
   if (invoiceData.status) invoiceData.status = invoiceData.status.toUpperCase();
-
-  const classId = req.query.class_id || req.body.class_id;
-  if (!classId) throw new BadRequestError("Class Id is required!");
-
-  // Kiểm tra class tồn tại
-  const token = getBearer(req);
-  await ClassServiceClient.getClassById(classId, token);
 
   // Kiểm tra student tồn tại
   await StudentServiceClient.getStudentById(invoiceData.student_id, token);
@@ -84,7 +66,7 @@ export const createInvoice = asyncWrapper(async (req, res) => {
   });
 })
 
-// PATCH /tuition/invoices/:id?class_id=
+// PATCH /tuition/invoices/:id?class_id=xxx
 // Cập nhật invoice
 export const updateInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
@@ -108,7 +90,7 @@ export const updateInvoice = asyncWrapper(async (req, res) => {
   });
 })
 
-// PATCH /tuition/invoices/:id?class_id=
+// PATCH /tuition/invoices/:id/cancel?class_id=xxx
 // Hủy invoice (không xóa mà chỉ update status = CANCELLED)
 export const cancelInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
@@ -130,7 +112,7 @@ export const cancelInvoice = asyncWrapper(async (req, res) => {
   });
 });
 
-// DELETE /tuition/invoices/:id?class_id=
+// DELETE /tuition/invoices/:id?class_id=xxx
 // Xóa invoice (chỉ dành cho môi trường dev)
 export const deleteInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;

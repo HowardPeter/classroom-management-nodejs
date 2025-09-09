@@ -28,7 +28,7 @@ const updateInvoiceStatus = asyncWrapper(async (invoiceId) => {
   return newStatus;
 });
 
-// GET /tuition/invoices/:id/payments
+// GET /tuition/invoices/:id/payments?class_id=xxx
 // Lấy danh sách payment của 1 invoice
 export const getPaymentsByInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
@@ -44,7 +44,7 @@ export const getPaymentsByInvoice = asyncWrapper(async (req, res) => {
   });
 });
 
-// POST /tuition/invoices/:id/payments
+// POST /tuition/invoices/:id/payments?class_id=xxx
 // Tạo payment mới cho 1 invoice
 export const createPayment = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
@@ -81,7 +81,7 @@ export const createPayment = asyncWrapper(async (req, res) => {
   });
 });
 
-// DELETE /tuition/payments/:paymentId
+// DELETE /tuition/payments/:paymentId?class_id=xxx
 // Xóa 1 payment
 export const deletePayment = asyncWrapper(async (req, res) => {
   const { paymentId } = req.params;

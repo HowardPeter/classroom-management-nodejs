@@ -1,11 +1,9 @@
 import express from 'express'
 import { deletePayment } from '../controllers/paymentController.js'
-import { validate } from '../middlewares/index.js'
+import { authorize } from '../middlewares/index.js'
 
 const router = express.Router();
 
-router
-  .route('/:paymentId')
-  .delete(deletePayment)
+router.delete('/:paymentId', authorize("owner", "manager"), deletePayment)
 
 export default router;
