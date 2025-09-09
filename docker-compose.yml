@@ -20,14 +20,21 @@ services:
 
   class-db:
     image: postgres:17-alpine
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: classdb
     volumes:
       - class_data:/var/lib/postgresql/data
+
+  tuition-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: tuitiondb
+    volumes:
+      - tuition_data:/var/lib/postgresql/data
 
   auth:
     build:
@@ -87,7 +94,26 @@ services:
       - class-db
       - auth
 
+  tuition:
+    build:
+      context: .
+      dockerfile: tuition-service/Dockerfile
+      target: development
+    ports:
+      - '3004:3004'
+    volumes:
+      - ./tuition-service:/app:delegated
+      - ./shared-libs:/app/shared-libs:delegated
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - tuition-db
+      - auth
+
 volumes:
   user-data:
   student_data:
   class_data:
+  tuition_data:

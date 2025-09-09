@@ -64,13 +64,13 @@ export const createNewClass = asyncWrapper(async (req, res) => {
 
   try {
     await UserClassRepository.createOne({
-      class_id: result.class_id,
+      class_id: classId,
       user_id: userId,
       role: "owner"
     });
   } catch (err) {
     // rollback class nếu lỗi khi insert userClass
-    await ClassRepository.deleteById(result.class_id);
+    await ClassRepository.deleteById(classId);
     throw err;
   }
 

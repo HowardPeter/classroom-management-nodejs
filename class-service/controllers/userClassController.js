@@ -1,20 +1,12 @@
 import ClassRepository from '../repositories/classRepository.js'
 import UserClassRepository from '../repositories/userClassRepository.js'
 import { asyncWrapper } from "#shared/middlewares/index.js"
-import { getBearer } from '../utils/index.js'
+import { getBearer } from '#shared/utils/index.js'
 import { UserServiceClient } from '../api/index.js'
 import { BadRequestError, ConflictError, NotFoundError } from "#shared/errors/errors.js"
 
 export const getUserClasses = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const token = getBearer(req);
 
   const userClasses = await UserClassRepository.findByClassId(classId);
@@ -45,13 +37,6 @@ export const getUserClasses = asyncWrapper(async (req, res) => {
 
 export const addUserClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const token = getBearer(req);
 
   const { user_id, role } = req.body;
@@ -83,15 +68,9 @@ export const addUserClass = asyncWrapper(async (req, res) => {
 
 export const changeUserClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const userId = req.params.userId;
   const { role } = req.body;
+
   if (!role) throw new BadRequestError("New role is required!");
 
   const result = await UserClassRepository.updateMany({
@@ -114,12 +93,6 @@ export const changeUserClass = asyncWrapper(async (req, res) => {
 
 export const removeUserClass = asyncWrapper(async (req, res) => {
   const { id: classId, userId } = req.params;
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
 
   const userClasses = await UserClassRepository.findByClassId(classId);
   if (!userClasses || userClasses.length === 0) throw new NotFoundError("Class not found or has no users");
@@ -138,14 +111,8 @@ export const removeUserClass = asyncWrapper(async (req, res) => {
 
 export const joinClass = asyncWrapper(async (req, res) => {
   const { class_id } = req.body;
-  const classExist = await ClassRepository.findOne({ class_id: class_id });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const userId = req.user?.userId;
+
   if (!userId) throw new NotFoundError("Cannot get user Id!");
 
   const hasUser = await UserClassRepository.findOne({
@@ -168,14 +135,8 @@ export const joinClass = asyncWrapper(async (req, res) => {
 
 export const leaveClass = asyncWrapper(async (req, res) => {
   const { class_id } = req.body;
-  const classExist = await ClassRepository.findOne({ class_id: class_id });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const userId = req.user.userId;
+
   if (!userId) throw new NotFoundError("Cannot get user Id!");
 
   await UserClassRepository.deleteMany({
@@ -187,4 +148,18 @@ export const leaveClass = asyncWrapper(async (req, res) => {
     success: true,
     msg: "Leave class successfully"
   });
+})
+
+export const checkUserClass = asyncWrapper(async (req, res) => {
+  const classId = req.params.classId;
+  const { user_id: userId } = req.query;
+
+  if (!classId || !userId) throw new BadRequestError("Class Id and User Id are required!");
+
+  const userClass = await UserClassRepository.findOne({
+    user_id: userId,
+    class_id: classId,
+  });
+
+  res.status(200).json(userClass);
 })

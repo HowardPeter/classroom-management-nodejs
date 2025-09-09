@@ -1,13 +1,13 @@
-import express from 'express'
+import express from 'express';
 import morgan from 'morgan';
 import cookieParser from "cookie-parser";
 
-import router from './routes/classRoutes.js';
-import { authentication } from './middlewares/index.js';
+import { invoiceRouter, paymentRouter, reportRouter } from './routes/index.js';
+import { authentication, checkClassExist } from './middlewares/index.js';
 import { errorHandler, routeNotFound } from '#shared/middlewares/index.js';
 
 const app = express();
-const PORT = 3003;
+const PORT = 3004;
 
 app.use(express.json());
 app.use(cookieParser());
@@ -15,7 +15,9 @@ app.use(morgan('dev'));
 
 app.use(authentication);
 
-app.use('/classes', router);
+app.use('/tuition/invoices', checkClassExist, invoiceRouter);
+app.use('/tuition/payments', checkClassExist, paymentRouter);
+app.use('/tuition/reports', reportRouter);
 
 app.use(routeNotFound);
 app.use(errorHandler);

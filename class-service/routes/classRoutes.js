@@ -1,8 +1,8 @@
 import express from 'express'
-import { authorize, validate } from '../middlewares/index.js'
+import { authorize, validate, checkClassExist } from '../middlewares/index.js'
 import { getClasses, getClass, createNewClass, updateClass, deleteClass } from '../controllers/classController.js'
 import { getStudentsInClass, addStudentToClass, changeStudentClass, removeStudentFromClass } from '../controllers/enrollmentController.js'
-import { getUserClasses, addUserClass, joinClass, changeUserClass, removeUserClass, leaveClass } from '../controllers/userClassController.js'
+import { getUserClasses, addUserClass, joinClass, changeUserClass, removeUserClass, leaveClass, checkUserClass } from '../controllers/userClassController.js'
 
 const router = express.Router()
 
@@ -19,26 +19,28 @@ router
 
 router
   .route('/:id/students')
-  .get(getStudentsInClass)
-  .post(validate("enrollment"), authorize("owner", "manager"), addStudentToClass)
+  .get(checkClassExist, getStudentsInClass)
+  .post(checkClassExist, validate("enrollment"), authorize("owner", "manager"), addStudentToClass)
   
   router
   .route('/:id/students/:studentId')
-  .patch(validate("enrollment"), authorize("owner", "manager"), changeStudentClass)
-  .delete(authorize("owner", "manager"), removeStudentFromClass)
+  .patch(checkClassExist, validate("enrollment"), authorize("owner", "manager"), changeStudentClass)
+  .delete(checkClassExist, authorize("owner", "manager"), removeStudentFromClass)
 
 router
   .route('/:id/users')
-  .get(authorize("owner", "manager"), getUserClasses)
-  .post(validate("userClass"), authorize("owner"), addUserClass)
+  .get(checkClassExist, authorize("owner", "manager"), getUserClasses)
+  .post(checkClassExist, validate("userClass"), authorize("owner"), addUserClass)
 
-router.delete('/:id/users/me', authorize("manager"), leaveClass)
+router.delete('/:id/users/me', checkClassExist, authorize("manager"), leaveClass)
 
 router
   .route('/:id/users/:userId')
-  .patch(validate("userClass"), authorize("owner"), changeUserClass)
-  .delete(authorize("owner"), removeUserClass)
+  .patch(checkClassExist, validate("userClass"), authorize("owner"), changeUserClass)
+  .delete(checkClassExist, authorize("owner"), removeUserClass)
 
 router.post('/join', joinClass)
+
+router.get('/:classId/permissions', checkUserClass)
 
 export default router;
