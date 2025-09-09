@@ -1,5 +1,6 @@
 import BaseRepository from "./BaseRepository.js";
 import prisma from "../prismaClient.js";
+import { getMonthRange } from "../utils/index.js";
 
 class InvoiceRepository extends BaseRepository {
   constructor() {
@@ -13,6 +14,18 @@ class InvoiceRepository extends BaseRepository {
         payments: true
       },
     });
+  }
+
+  async findByMonth(classId, year, month) {
+    return await this.model.findMany({
+      where: {
+        class_id: classId,
+        due_date: getMonthRange(year, month)
+      },
+      include: {
+        payments: true
+      }
+    })
   }
 
   async updateById(id, data) {

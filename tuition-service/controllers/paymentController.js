@@ -1,5 +1,5 @@
 import { asyncWrapper } from "#shared/middlewares/index.js"
-import { NotFoundError, ConflictError } from "#shared/errors/errors.js"
+import { NotFoundError, ConflictError, BadRequestError } from "#shared/errors/errors.js"
 import PaymentRepository from '../repositories/paymentRepository.js'
 import InvoiceRepository from "../repositories/invoiceRepository.js"
 
@@ -54,11 +54,18 @@ export const createPayment = asyncWrapper(async (req, res) => {
   if (paymentData.method) paymentData.method = paymentData.method.toUpperCase();
 
   // kiểm tra invoice tồn tại
-  const invoice = await InvoiceRepository.findOne({ invoice_id: invoiceId });
+  const invoice = await InvoiceRepository.findOne({ invoice_id: invoiceId }, {
+    include: { payments: true }
+  });
   if (!invoice) throw new NotFoundError("Invoice not found!");
 
   // Trả về nếu invoice đã PAID
   if (invoice.status === "PAID") throw new ConflictError("Invoice is already fully paid!");
+
+  // Trả về nếu payment amount > invoice amount
+  const sumAmount = invoice.payments.reduce((sum, payment) => sum + Number(payment.amount) + paymentData.amount, 0);
+  if (sumAmount > invoice.required_amount)
+    throw new BadRequestError(`The amount paid exceeded the amount of the invoice requested! Exceed: ${sumAmount}/${invoice.required_amount}`)
 
   const newPayment = await PaymentRepository.createOne({
     invoice_id: invoiceId,
