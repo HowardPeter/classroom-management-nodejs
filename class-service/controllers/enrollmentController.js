@@ -7,13 +7,6 @@ import { BadRequestError, ConflictError, NotFoundError } from "#shared/errors/er
 
 export const getStudentsInClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const token = getBearer(req);
 
   const enrollments = await EnrollmentRepository.findByClassId(classId);
@@ -27,21 +20,11 @@ export const getStudentsInClass = asyncWrapper(async (req, res) => {
   const ids = enrollments.map(e => e.student_id).join(",");
   const students = await StudentServiceClient.getStudentByIds(ids, token);
 
-  res.status(200).json({
-    success: true,
-    data: students
-  })
+  res.status(200).json(students);
 })
 
 export const addStudentToClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const token = getBearer(req);
 
   const { student_id } = req.body;
@@ -71,15 +54,9 @@ export const addStudentToClass = asyncWrapper(async (req, res) => {
 
 export const changeStudentClass = asyncWrapper(async (req, res) => {
   const oldClassId = req.params.id;
-  const classExist = await ClassRepository.findOne({ class_id: oldClassId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const studentId = req.params.studentId;
   const { class_id: newClassId } = req.body;
+
   if (!newClassId) throw new BadRequestError("Require new class Id!");
 
   const token = getBearer(req);
@@ -109,13 +86,6 @@ export const changeStudentClass = asyncWrapper(async (req, res) => {
 
 export const removeStudentFromClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-  const classExist = await ClassRepository.findOne({ class_id: classId });
-  if (!classExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Wrong class Id! Class does not exist."
-    })
-
   const studentId = req.params.studentId;
   const token = getBearer(req);
 
