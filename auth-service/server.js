@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser"
 
 import router from './routes/authRoutes.js'
 import DbConnect from './db/connect.js'
-import { errorHandler } from '#shared/middlewares/error-handler.js'
+import { errorHandler, routeNotFound } from '#shared/middlewares/index.js'
 
 const app = express();
 const PORT = 3001;
@@ -16,6 +16,7 @@ app.use(morgan('dev'));
 
 app.use('/users', router);
 
+app.use(routeNotFound);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

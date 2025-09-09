@@ -3,8 +3,8 @@ import morgan from 'morgan';
 import cookieParser from "cookie-parser";
 
 import router from './routes/studentRoutes.js'
-import { errorHandler } from '#shared/middlewares/error-handler.js'
 import authentication from './middleware/authentication.js'
+import { errorHandler, routeNotFound } from '#shared/middlewares/index.js'
 
 const app = express();
 const PORT = 3002;
@@ -17,6 +17,7 @@ app.use(authentication);
 
 app.use('/students', router);
 
+app.use(routeNotFound);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

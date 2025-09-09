@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 
 import router from './routes/classRoutes.js';
 import { authentication } from './middlewares/index.js';
-import { errorHandler } from '#shared/middlewares/index.js';
+import { errorHandler, routeNotFound } from '#shared/middlewares/index.js';
 
 const app = express();
 const PORT = 3003;
@@ -17,6 +17,7 @@ app.use(authentication);
 
 app.use('/classes', router);
 
+app.use(routeNotFound);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
