@@ -70,7 +70,7 @@ export const changeUserClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
   const userId = req.params.userId;
   const { role } = req.body;
-  
+
   if (!role) throw new BadRequestError("New role is required!");
 
   const result = await UserClassRepository.updateMany({
@@ -148,4 +148,18 @@ export const leaveClass = asyncWrapper(async (req, res) => {
     success: true,
     msg: "Leave class successfully"
   });
+})
+
+export const checkUserClass = asyncWrapper(async (req, res) => {
+  const classId = req.params.classId;
+  const { user_id: userId } = req.query;
+
+  if (!classId || !userId) throw new BadRequestError("Class Id and User Id are required!");
+
+  const userClass = await UserClassRepository.findOne({
+    user_id: userId,
+    class_id: classId,
+  });
+
+  res.status(200).json(userClass);
 })

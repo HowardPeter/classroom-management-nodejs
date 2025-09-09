@@ -2,8 +2,8 @@ import express from 'express'
 import morgan from 'morgan';
 import cookieParser from "cookie-parser";
 
-import router from './routes/classRoutes.js'
-import { authentication } from './middlewares/index.js'
+import router from './routes/classRoutes.js';
+import { authentication } from './middlewares/index.js';
 import { errorHandler } from '#shared/middlewares/index.js';
 
 const app = express();

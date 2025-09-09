@@ -2,7 +2,7 @@ import express from 'express'
 import { authorize, validate, checkClassExist } from '../middlewares/index.js'
 import { getClasses, getClass, createNewClass, updateClass, deleteClass } from '../controllers/classController.js'
 import { getStudentsInClass, addStudentToClass, changeStudentClass, removeStudentFromClass } from '../controllers/enrollmentController.js'
-import { getUserClasses, addUserClass, joinClass, changeUserClass, removeUserClass, leaveClass } from '../controllers/userClassController.js'
+import { getUserClasses, addUserClass, joinClass, changeUserClass, removeUserClass, leaveClass, checkUserClass } from '../controllers/userClassController.js'
 
 const router = express.Router()
 
@@ -40,5 +40,7 @@ router
   .delete(checkClassExist, authorize("owner"), removeUserClass)
 
 router.post('/join', joinClass)
+
+router.get('/:classId/permissions', checkUserClass)
 
 export default router;
