@@ -45,3 +45,14 @@ jobs:
         uses: ./.github/setup-deps
         with:
           context: ./class-service
+    
+  build-tuition:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup & cache
+        uses: ./.github/setup-deps
+        with:
+          context: ./tuition-service
