@@ -1,4 +1,4 @@
-import prisma from "../models/prismaClient.js";
+import prisma from "../prismaClient.js";
 
 class StudentRepository {
   constructor(prismaClient) {
