@@ -41,11 +41,11 @@ export const getTeacher = asyncWrapper(async (req, res) => {
 // POST /teachers
 // Tạo teacher mới
 export const createTeacher = asyncWrapper(async (req, res) => {
-  const newTeacherData = req.body;
+  const newTeacherData = { ...req.body };
 
   try {
     const result = await TeacherRepository.createOne(newTeacherData);
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: result,
     });
@@ -67,12 +67,19 @@ export const updateTeacher = asyncWrapper(async (req, res) => {
   const teacher = await TeacherRepository.findById(teacherId);
   if (!teacher) throw new NotFoundError("Teacher not found!");
 
-  const result = await TeacherRepository.updateById(teacherId, updateData);
+  try {
+    const result = await TeacherRepository.updateById(teacherId, updateData);
 
-  res.status(200).json({
-    success: true,
-    data: result,
-  });
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    if (err.code === "P2002") {
+      throw new ConflictError("Phone or email already exists!");
+    }
+    throw err;
+  }
 });
 
 // DELETE /teachers/:id

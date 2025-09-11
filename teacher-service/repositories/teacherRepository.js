@@ -23,7 +23,7 @@ class TeacherRepository {
 
   async findById(id) {
     return await this.prisma.teacher.findUnique({
-      where: { student_id: id },
+      where: { teacher_id: id },
     });
   }
 
@@ -39,14 +39,14 @@ class TeacherRepository {
 
   async updateById(id, data) {
     return await this.prisma.teacher.update({
-      where: { student_id: id },
+      where: { teacher_id: id },
       data: data,
     });
   }
 
   async deleteById(id) {
     return await this.prisma.teacher.delete({
-      where: { student_id: id },
+      where: { teacher_id: id },
     });
   }
 }
