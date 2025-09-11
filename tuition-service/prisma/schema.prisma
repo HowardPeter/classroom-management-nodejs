@@ -24,6 +24,7 @@ model Invoice {
   due_date         DateTime?
   status           InvoiceStatus? @default(PENDING)
   created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
 
   payments         Payment[]
 }

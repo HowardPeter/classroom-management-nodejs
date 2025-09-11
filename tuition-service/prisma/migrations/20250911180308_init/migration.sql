@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "public"."InvoiceStatus" AS ENUM ('PENDING', 'PAID', 'OVERDUE', 'PARTIAL');
+CREATE TYPE "public"."InvoiceStatus" AS ENUM ('PENDING', 'PAID', 'OVERDUE', 'PARTIAL', 'CANCELLED');
 
 -- CreateEnum
 CREATE TYPE "public"."PaymentMethod" AS ENUM ('CASH', 'BANK', 'MOMO', 'OTHER');
@@ -14,6 +14,7 @@ CREATE TABLE "public"."Invoice" (
     "due_date" TIMESTAMP(3),
     "status" "public"."InvoiceStatus" DEFAULT 'PENDING',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Invoice_pkey" PRIMARY KEY ("invoice_id")
 );

@@ -20,7 +20,10 @@ class InvoiceRepository extends BaseRepository {
     return await this.model.findMany({
       where: {
         class_id: classId,
-        due_date: getMonthRange(year, month)
+        due_date: getMonthRange(year, month),
+        NOT: {
+          status: "CANCELLED"
+        }
       },
       include: {
         payments: true

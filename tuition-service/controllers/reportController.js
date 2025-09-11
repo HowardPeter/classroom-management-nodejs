@@ -88,7 +88,12 @@ export const getStudentTuitionReport = asyncWrapper(async (req, res) => {
   const token = getBearer(req);
   const student = await StudentServiceClient.getStudentById(studentId, token);
 
-  const studentInvoices = await InvoiceRepository.findMany({ student_id: studentId }, {
+  const studentInvoices = await InvoiceRepository.findMany({
+    student_id: studentId,
+    NOT: {
+      status: "CANCELLED"
+    }
+  }, {
     include: { payments: true }
   });
 
