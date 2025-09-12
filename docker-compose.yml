@@ -132,6 +132,8 @@ services:
       - ./teacher-service:/app:delegated
       - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
+    env_file:
+      - ./teacher-service/.env
     environment:
       - DATABASE_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
       - CHOKIDAR_USEPOLLING=true
