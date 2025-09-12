@@ -14,7 +14,7 @@ const NormalizeStrategy = {
   updated_at_to: (k, q, f, v) => Nomalizer.dateRange(q, f, "updated_at"),
 };
 
-export const normalizeFilter = (query) => {
+export default function normalizeFilter (query) {
   const filter = {};
 
   // Duyệt qua từng phần tử trong query
