@@ -77,13 +77,16 @@ export const createStudent = asyncWrapper(async (req, res) => {
 export const updateStudent = asyncWrapper(async (req, res) => {
   const studentId = req.params.id;
 
-  let updateData = { ...req.body };
+  const updateData = { ...req.body };
 
   if (updateData.date_of_birth) updateData.date_of_birth = new Date(updateData.date_of_birth);
   if (updateData.enrollment_date) updateData.enrollment_date = new Date(updateData.enrollment_date);
 
   const student = await StudentRepository.findById(studentId);
   if (!student) throw new NotFoundError("Student not found!");
+
+  if (!updateData || Object.keys(updateData).length === 0)
+    throw new BadRequestError("No update data provided!");
 
   try {
     const result = await StudentRepository.updateById(studentId, updateData);

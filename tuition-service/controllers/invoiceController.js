@@ -46,10 +46,9 @@ export const getInvoice = asyncWrapper(async (req, res) => {
 // POST /tuition/invoices/?class_id=xxx
 // Tạo invoice mới
 export const createInvoice = asyncWrapper(async (req, res) => {
-  const invoiceData = req.body;
+  const invoiceData = { ...req.body };
 
   if (invoiceData.due_date) invoiceData.due_date = new Date(invoiceData.due_date);
-  if (invoiceData.status) invoiceData.status = invoiceData.status.toUpperCase();
 
   // Kiểm tra student tồn tại
   const token = getBearer(req);
@@ -75,12 +74,11 @@ export const updateInvoice = asyncWrapper(async (req, res) => {
   const invoice = await InvoiceRepository.findById(invoiceId);
   if (!invoice) throw new NotFoundError("Invoice not found!");
 
-  if(invoice.status === "CANCELLED") throw new ForbiddenError("Cancelled invoice cannot be modified!");
+  if (invoice.status === "CANCELLED") throw new ForbiddenError("Cancelled invoice cannot be modified!");
 
-  const updateData = req.body;
+  const updateData = { ...req.body };
 
   if (updateData.due_date) updateData.due_date = new Date(updateData.due_date);
-  if (updateData.status) updateData.status = updateData.status.toUpperCase();
 
   if (!updateData || Object.keys(updateData).length === 0)
     throw new BadRequestError("No update data provided!");
