@@ -1,6 +1,6 @@
 # Classroom Manager System
 
-A microservices-based management system to help user manage their learning center, sport club,... built with Node.js, featuring authentication, student management, class management, teacher management, and tuition tracking.
+A backend microservices-based management system to help user manage their learning center, sport club,... built with Node.js, featuring authentication, student management, class management, teacher management, and tuition tracking.
 
 ## Architecture
 
