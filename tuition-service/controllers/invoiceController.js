@@ -1,16 +1,14 @@
 import { asyncWrapper } from "#shared/middlewares/index.js"
 import { paginate, getBearer } from '#shared/utils/index.js'
-import { NotFoundError, BadRequestError, ConflictError } from "#shared/errors/errors.js"
+import { NotFoundError, BadRequestError, ConflictError, ForbiddenError } from "#shared/errors/errors.js"
 import InvoiceRepository from '../repositories/invoiceRepository.js'
-import { ClassServiceClient, StudentServiceClient } from '../api/index.js'
+import { StudentServiceClient } from '../api/index.js'
 import { normalizeFilter } from '../utils/index.js'
 
 // GET /tuition/invoices/?class_id=xxx
 // Tìm invoice trong class theo class id và filter (nếu có)
 export const getInvoices = asyncWrapper(async (req, res) => {
   const { page = 1, limit = 10, orderBy = { created_at: "asc" }, class_id: classId, ...rawFilter } = req.query;
-
-  if (!classId) throw new BadRequestError("Class Id is required!");
 
   const filter = normalizeFilter(rawFilter);
 
@@ -36,6 +34,7 @@ export const getInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
   const invoice = await InvoiceRepository.findById(invoiceId);
 
+  // Kiểm tra invoice tồn tại
   if (!invoice) throw new NotFoundError("Invoice not found!");
 
   res.status(200).json({
@@ -47,15 +46,16 @@ export const getInvoice = asyncWrapper(async (req, res) => {
 // POST /tuition/invoices/?class_id=xxx
 // Tạo invoice mới
 export const createInvoice = asyncWrapper(async (req, res) => {
-  const invoiceData = req.body;
+  const invoiceData = { ...req.body };
 
   if (invoiceData.due_date) invoiceData.due_date = new Date(invoiceData.due_date);
-  if (invoiceData.status) invoiceData.status = invoiceData.status.toUpperCase();
 
   // Kiểm tra student tồn tại
+  const token = getBearer(req);
   await StudentServiceClient.getStudentById(invoiceData.student_id, token);
 
   // Gán class_id vào data
+  const { class_id: classId } = req.query;
   invoiceData.class_id = classId;
 
   const newInvoice = await InvoiceRepository.createOne(invoiceData);
@@ -71,13 +71,14 @@ export const createInvoice = asyncWrapper(async (req, res) => {
 export const updateInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
 
-  const isInvoiceExist = await InvoiceRepository.findById(invoiceId);
-  if (!isInvoiceExist) throw new NotFoundError("Invoice not found!");
+  const invoice = await InvoiceRepository.findById(invoiceId);
+  if (!invoice) throw new NotFoundError("Invoice not found!");
 
-  const updateData = req.body;
+  if (invoice.status === "CANCELLED") throw new ForbiddenError("Cancelled invoice cannot be modified!");
+
+  const updateData = { ...req.body };
 
   if (updateData.due_date) updateData.due_date = new Date(updateData.due_date);
-  if (updateData.status) updateData.status = updateData.status.toUpperCase();
 
   if (!updateData || Object.keys(updateData).length === 0)
     throw new BadRequestError("No update data provided!");
@@ -107,13 +108,13 @@ export const cancelInvoice = asyncWrapper(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    msg: "Invoice cancelled successfully",
+    msg: "Canceling invoice successfully",
     data: cancelledInvoice
   });
 });
 
 // DELETE /tuition/invoices/:id?class_id=xxx
-// Xóa invoice (chỉ dành cho môi trường dev)
+// Xóa invoice (dev only)
 export const deleteInvoice = asyncWrapper(async (req, res) => {
   const { id: invoiceId } = req.params;
 
@@ -125,6 +126,6 @@ export const deleteInvoice = asyncWrapper(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    msg: "Invoice and its recorded payments delete successfully"
+    msg: "Deleting invoice and involved payments successfully"
   });
 })

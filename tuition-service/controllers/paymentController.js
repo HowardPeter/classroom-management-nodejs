@@ -21,6 +21,7 @@ const setInvoiceStatus = async (invoice) => {
 // Hàm cập nhật invoice status
 const updateInvoiceStatus = asyncWrapper(async (invoiceId) => {
   const invoice = await InvoiceRepository.findById(invoiceId);
+  if(invoice.status === "CANCELLED") throw new ForbiddenError("Cancelled invoice cannot be modified!");
 
   const newStatus = await setInvoiceStatus(invoice);
   await InvoiceRepository.updateById(invoiceId, { status: newStatus });
@@ -53,19 +54,22 @@ export const createPayment = asyncWrapper(async (req, res) => {
   if (paymentData.paid_at) paymentData.paid_at = new Date(paymentData.paid_at);
   if (paymentData.method) paymentData.method = paymentData.method.toUpperCase();
 
-  // kiểm tra invoice tồn tại
+  // Kiểm tra invoice tồn tại
   const invoice = await InvoiceRepository.findOne({ invoice_id: invoiceId }, {
     include: { payments: true }
   });
   if (!invoice) throw new NotFoundError("Invoice not found!");
+
+  // Trả về nêu invoice status = CANCELLED
+  if(invoice.status === "CANCELLED") throw new ForbiddenError("Cancelled invoice cannot be modified!");
 
   // Trả về nếu invoice đã PAID
   if (invoice.status === "PAID") throw new ConflictError("Invoice is already fully paid!");
 
   // Trả về nếu payment amount > invoice amount
   const sumAmount = invoice.payments.reduce((sum, payment) => sum + Number(payment.amount) + paymentData.amount, 0);
-  if (sumAmount > invoice.required_amount)
-    throw new BadRequestError(`The amount paid exceeded the amount of the invoice requested! Exceed: ${sumAmount}/${invoice.required_amount}`)
+  if (sumAmount > invoice.required_amount || paymentData.amount > invoice.required_amount)
+    throw new BadRequestError('The amount paid exceeded the amount of the invoice requested!');
 
   const newPayment = await PaymentRepository.createOne({
     invoice_id: invoiceId,

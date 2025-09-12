@@ -56,3 +56,14 @@ jobs:
         uses: ./.github/setup-deps
         with:
           context: ./tuition-service
+
+  build-teacher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Setup & cache
+        uses: ./.github/setup-deps
+        with:
+          context: ./teacher-service

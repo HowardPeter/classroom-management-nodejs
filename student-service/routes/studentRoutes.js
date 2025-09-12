@@ -14,7 +14,7 @@ router.get('/by-ids', getStudentByIds)
 router
   .route('/:id')
   .get(getStudent)
-  .put(validateStudent, updateStudent)
+  .patch(validateStudent, updateStudent)
   .delete(deleteStudent)
 
 export default router;

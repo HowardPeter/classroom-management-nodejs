@@ -36,6 +36,15 @@ services:
     volumes:
       - tuition_data:/var/lib/postgresql/data
 
+  teacher-db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: teacherdb
+    volumes:
+      - teacher_data:/var/lib/postgresql/data
+
   auth:
     build:
       context: .
@@ -112,8 +121,29 @@ services:
       - tuition-db
       - auth
 
+  teacher:
+    build:
+      context: .
+      dockerfile: teacher-service/Dockerfile
+      target: development
+    ports:
+      - '3005:3005'
+    volumes:
+      - ./teacher-service:/app:delegated
+      - ./shared-libs:/app/shared-libs:delegated
+      - /app/node_modules
+    env_file:
+      - ./teacher-service/.env
+    environment:
+      - DATABASE_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - teacher-db
+      - auth
+
 volumes:
   user-data:
   student_data:
   class_data:
   tuition_data:
+  teacher_data:

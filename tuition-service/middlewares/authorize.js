@@ -8,9 +8,6 @@ export const authorize = (...allowedRoles) => {
       const userId = req.user.userId;
       const token = getBearer(req);
 
-      console.log("Class ", classId);
-      console.log("User ", userId);
-
       const allowed = await checkPermission(classId, userId, token, allowedRoles);
 
       if (!allowed) {

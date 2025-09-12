@@ -1,8 +1,9 @@
 import ClassRepository from '../repositories/classRepository.js'
 import UserClassRepository from '../repositories/userClassRepository.js'
 import EnrollmentRepository from '../repositories/enrollmentRepository.js'
+import { TeacherServiceClient } from '../api/index.js'
 import { asyncWrapper } from "#shared/middlewares/index.js"
-import { paginate } from '#shared/utils/index.js'
+import { paginate, getBearer } from '#shared/utils/index.js'
 import { NotFoundError } from "#shared/errors/errors.js"
 
 export const getClasses = asyncWrapper(async (req, res) => {
@@ -39,12 +40,7 @@ export const getClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
 
   const result = await ClassRepository.findById(classId);
-
-  if (!result)
-    return res.status(404).json({
-      success: false,
-      msg: "Class not found. Check the Id again!"
-    })
+  if (!result) throw new NotFoundError("Class not found. Check the Id again!");
 
   res.status(200).json({
     success: true,
@@ -53,7 +49,13 @@ export const getClass = asyncWrapper(async (req, res) => {
 })
 
 export const createNewClass = asyncWrapper(async (req, res) => {
-  const newClassData = req.body;
+  const newClassData = { ...req.body };
+
+  // Kiểm tra teacher tồn tại
+  if (newClassData.teacher_id) {
+    const token = getBearer(req);
+    await TeacherServiceClient.getTeacherById(newClassData.teacher_id, token);
+  }
 
   const result = await ClassRepository.createOne(newClassData);
 
@@ -82,19 +84,19 @@ export const createNewClass = asyncWrapper(async (req, res) => {
 
 export const updateClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
-  const updateData = req.body;
+  const updateData = { ...req.body };
 
-  if (!updateData || Object.keys(updateData).length === 0) {
+  if (!updateData || Object.keys(updateData).length === 0)
     throw new BadRequestError("No update data provided!");
-  }
 
   const isClassExist = await ClassRepository.findById(classId);
+  if (!isClassExist) throw new NotFoundError("Class not found. Check the Id again!");
 
-  if (!isClassExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Class not found. Check the Id again!"
-    })
+  // Kiểm tra teacher tồn tại
+  if (updateData.teacher_id) {
+    const token = getBearer(req);
+    await TeacherServiceClient.getTeacherById(updateData.teacher_id, token);
+  }
 
   const result = await ClassRepository.updateById(classId, updateData);
 
@@ -108,12 +110,7 @@ export const deleteClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
 
   const isClassExist = await ClassRepository.findById(classId);
-
-  if (!isClassExist)
-    return res.status(404).json({
-      success: false,
-      msg: "Class not found. Check the Id again!"
-    })
+  if (!isClassExist) throw new NotFoundError("Class not found. Check the Id again!");
 
   // Xóa record liên quan
   await EnrollmentRepository.deleteMany({ class_id: classId });
