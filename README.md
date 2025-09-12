@@ -20,6 +20,7 @@ This system consists of 5 microservices:
 - **Authentication**: JWT with RSA keys
 - **Containerization**: Docker & Docker Compose
 - **Storage**: AWS S3 Bucket (teacher profile image)
+- **CI/CD**: GitHub Actions
 
 ## Quick Start
 
