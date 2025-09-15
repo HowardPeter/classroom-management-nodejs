@@ -13,14 +13,13 @@ const classSchema = Joi.object({
 });
 
 const enrollmentSchema = Joi.object({
-  student_id: Joi.string().required(),
+  student_id: Joi.string().optional(),
   class_id: Joi.string().optional(),
 });
 
 const userClassSchema = Joi.object({
-  class_id: Joi.string().optional(),
-  user_id: Joi.string().required(),
-  role: Joi.string().valid("owner", "manager").required(),
+  user_id: Joi.string().optional(),
+  role: Joi.string().valid("owner", "manager", "viewer").required(),
 });
 
 export default function validate(type) {
