@@ -98,14 +98,7 @@ export const getStudentTuitionReport = asyncWrapper(async (req, res) => {
   });
 
   // Phân loại invoice theo class
-  const groupedInvoices = studentInvoices.reduce((groups, invoice) => {
-    const key = invoice.class_id;
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(invoice);
-    return groups;
-  }, {});
+  const groupedInvoices = Object.groupBy(studentInvoices, inv => inv.class_id);
 
   // Tổng số invoice
   const totalInvoice = studentInvoices.length;
