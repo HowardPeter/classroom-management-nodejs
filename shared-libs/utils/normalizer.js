@@ -28,7 +28,13 @@ export class Nomalizer {
 
   // Chuẩn hóa lọc query field text
   static text(key, value, filter) {
-    filter[key] = { contains: value, mode: "insensitive" };
+    if (Array.isArray(value)) {
+      filter.OR = value.map(v => ({
+        [key]: { contains: v, mode: "insensitive" }
+      }));
+    } else {
+      filter[key] = { contains: value, mode: "insensitive" };
+    }
     return filter;
   }
 }
