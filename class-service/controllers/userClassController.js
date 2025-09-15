@@ -78,12 +78,7 @@ export const changeUserClass = asyncWrapper(async (req, res) => {
     user_id: userId
   }, { role: role });
 
-  if (result.count === 0) {
-    return res.status(404).json({
-      success: false,
-      msg: "User has no role in the class!"
-    })
-  }
+  if (result.count === 0) throw new NotFoundError("User has no role in the class!");
 
   res.status(200).json({
     success: true,
@@ -110,21 +105,21 @@ export const removeUserClass = asyncWrapper(async (req, res) => {
 })
 
 export const joinClass = asyncWrapper(async (req, res) => {
-  const { class_id } = req.body;
+  const { class_id: classId } = req.body;
   const userId = req.user?.userId;
 
   if (!userId) throw new NotFoundError("Cannot get user Id!");
 
   const hasUser = await UserClassRepository.findOne({
     class_id: classId,
-    user_id: user_id
+    user_id: userId
   })
   if (hasUser) throw new ConflictError("You had a role in this class!");
 
   const result = await UserClassRepository.createOne({
-    class_id: class_id,
+    class_id: classId,
     user_id: userId,
-    role: "manager"
+    role: "viewer"
   })
 
   res.status(201).json({

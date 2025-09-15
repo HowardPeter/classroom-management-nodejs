@@ -27,20 +27,20 @@ export const addStudentToClass = asyncWrapper(async (req, res) => {
   const classId = req.params.id;
   const token = getBearer(req);
 
-  const { student_id } = req.body;
-  if (!student_id) throw new BadRequestError("Cannot get student Id!");
+  const { student_id: studentId } = req.body;
+  if (!studentId) throw new BadRequestError("Cannot get student Id!");
 
   // Kiểm tra student tồn tại
-  await StudentServiceClient.getStudentById(student_id, token);
+  await StudentServiceClient.getStudentById(studentId, token);
 
   const newEnrollment = {
     class_id: classId,
-    student_id: student_id
+    student_id: studentId
   }
 
   const hasEnrollment = await EnrollmentRepository.findOne({
     class_id: classId,
-    student_id: student_id
+    student_id: studentId
   })
   if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 

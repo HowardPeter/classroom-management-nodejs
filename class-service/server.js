@@ -2,7 +2,7 @@ import express from 'express'
 import morgan from 'morgan';
 import cookieParser from "cookie-parser";
 
-import router from './routes/classRoutes.js';
+import { classRouter, enrollmentRouter, userClassRouter } from './routes/index.js';
 import { authentication } from './middlewares/index.js';
 import { errorHandler, routeNotFound } from '#shared/middlewares/index.js';
 
@@ -15,7 +15,9 @@ app.use(morgan('dev'));
 
 app.use(authentication);
 
-app.use('/classes', router);
+app.use('/classes', classRouter);
+app.use('/classes', enrollmentRouter);
+app.use('/classes', userClassRouter);
 
 app.use(routeNotFound);
 app.use(errorHandler);
