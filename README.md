@@ -19,7 +19,7 @@ This system consists of 5 microservices:
 - **ORM**: Prisma (PostgreSQL services), Mongoose (MongoDB)
 - **Authentication**: JWT with RSA keys
 - **Containerization**: Docker & Docker Compose
-- **Storage**: AWS S3 Bucket (teacher profile image)
+- **Storage**: AWS S3 Bucket (profile image)
 - **CI/CD**: GitHub Actions
 
 ## Quick Start
