@@ -8,7 +8,7 @@ import { normalizeFilter } from '../utils/index.js'
 // GET /tuition/invoices/?class_id=xxx
 // Tìm invoice trong class theo class id và filter (nếu có)
 export const getInvoices = asyncWrapper(async (req, res) => {
-  const { page = 1, limit = 10, orderBy = { created_at: "asc" }, class_id: classId, ...rawFilter } = req.query;
+  const { page = 1, limit = 10, orderBy, class_id: classId, ...rawFilter } = req.query;
 
   const filter = normalizeFilter(rawFilter);
 
@@ -19,7 +19,7 @@ export const getInvoices = asyncWrapper(async (req, res) => {
       class_id: classId,
       ...filter
     },
-    orderBy: orderBy
+    orderBy: orderBy ? JSON.parse(orderBy) : { created_at: "asc" },
   }));
 
   res.status(200).json({

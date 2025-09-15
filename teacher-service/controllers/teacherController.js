@@ -25,7 +25,7 @@ export const getTeachers = asyncWrapper(async (req, res) => {
     page: Number(page),
     limit: Number(limit),
     where: filters,
-    orderBy: orderBy,
+    orderBy: orderBy ? JSON.parse(orderBy) : { full_name: "asc" },
   });
 
   result.data = await Promise.all(

@@ -11,7 +11,7 @@ export const getClasses = asyncWrapper(async (req, res) => {
 
   if (!userId) throw new NotFoundError("Cannot get user Id!");
 
-  const { page = 1, limit = 10, orderBy = { class_name: 'asc' } } = req.query;
+  const { page = 1, limit = 10, orderBy } = req.query;
 
   const classes = await paginate(ClassRepository, {
     page: Number(page),
@@ -21,7 +21,7 @@ export const getClasses = asyncWrapper(async (req, res) => {
         some: { user_id: userId }
       }
     },
-    orderBy: orderBy,
+    orderBy: orderBy ? JSON.parse(orderBy) : { class_name: 'asc' },
     include: {
       userClasses: true,
       _count: {
