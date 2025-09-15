@@ -7,12 +7,12 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(authorize("owner", "manager"), getInvoices)
+  .get(getInvoices)
   .post(authorize("owner", "manager"), validate("invoice"), createInvoice)
 
 router
   .route('/:id')
-  .get(authorize("owner", "manager"), getInvoice)
+  .get(getInvoice)
   .patch(authorize("owner", "manager"), validate("invoice"), updateInvoice)
   .delete(authorize("owner", "manager"), deleteInvoice)
 
@@ -20,7 +20,7 @@ router.patch('/:id/cancel', authorize("owner", "manager"), cancelInvoice)
 
 router
   .route('/:id/payments')
-  .get(authorize("owner", "manager"), getPaymentsByInvoice)
+  .get(getPaymentsByInvoice)
   .post(authorize("owner", "manager"), validate("payment"), createPayment)
 
 export default router;
