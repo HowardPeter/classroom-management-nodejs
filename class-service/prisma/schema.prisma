@@ -44,4 +44,5 @@ model UserClass {
 enum Role {
   owner
   manager
+  viewer
 }

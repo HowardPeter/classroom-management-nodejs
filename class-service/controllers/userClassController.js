@@ -134,7 +134,7 @@ export const joinClass = asyncWrapper(async (req, res) => {
 })
 
 export const leaveClass = asyncWrapper(async (req, res) => {
-  const { class_id } = req.body;
+  const { class_id } = req.params.id;
   const userId = req.user.userId;
 
   if (!userId) throw new NotFoundError("Cannot get user Id!");
@@ -151,7 +151,7 @@ export const leaveClass = asyncWrapper(async (req, res) => {
 })
 
 export const checkUserClass = asyncWrapper(async (req, res) => {
-  const classId = req.params.classId;
+  const classId = req.params.id;
   const { user_id: userId } = req.query;
 
   if (!classId || !userId) throw new BadRequestError("Class Id and User Id are required!");

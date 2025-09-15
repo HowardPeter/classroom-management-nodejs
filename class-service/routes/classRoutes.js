@@ -21,8 +21,8 @@ router
   .route('/:id/students')
   .get(checkClassExist, getStudentsInClass)
   .post(checkClassExist, validate("enrollment"), authorize("owner", "manager"), addStudentToClass)
-  
-  router
+
+router
   .route('/:id/students/:studentId')
   .patch(checkClassExist, validate("enrollment"), authorize("owner", "manager"), changeStudentClass)
   .delete(checkClassExist, authorize("owner", "manager"), removeStudentFromClass)
@@ -41,6 +41,6 @@ router
 
 router.post('/join', joinClass)
 
-router.get('/:classId/permissions', checkUserClass)
+router.get('/:id/permissions', checkUserClass)
 
 export default router;
