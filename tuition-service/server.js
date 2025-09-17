@@ -3,8 +3,8 @@ import morgan from 'morgan';
 import cookieParser from "cookie-parser";
 
 import { invoiceRouter, paymentRouter, reportRouter } from './routes/index.js';
-import { authentication, checkClassExist } from './middlewares/index.js';
-import { errorHandler, routeNotFound } from '#shared/middlewares/index.js';
+import { checkClassExist } from './middlewares/index.js';
+import { authentication, errorHandler, routeNotFound } from '#shared/middlewares/index.js';
 
 const app = express();
 const PORT = 3004;

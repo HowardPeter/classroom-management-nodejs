@@ -1,0 +1,1 @@
+export { validateStudent } from './validate-field.js';
