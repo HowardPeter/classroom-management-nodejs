@@ -21,17 +21,17 @@ CMD ["npm", "run", "dev"]
 
 FROM base AS production
 
-RUN npm ci --omit=dev && npm cache clean --force
-
 RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nodeusr
-USER nodeusr
+  && adduser --system --uid 1001 nodeusr
+
+RUN npm ci --omit=dev && npm cache clean --force
 
 COPY class-service/ .
 COPY shared-libs ./shared-libs
 
-# Generate Prisma client lại cho môi trường production
-RUN npx prisma generate
+RUN npx prisma generate --schema=prisma/schema.prisma
+
+USER nodeusr
 
 ENV NODE_ENV=production
 
