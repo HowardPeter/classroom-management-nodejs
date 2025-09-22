@@ -56,7 +56,6 @@ export default class RedisCache {
         // lấy các keys match với pattern bằng redis.scan
         const [nextCursor, keys] = await redis.scan(cursor, "MATCH", fullPattern, "COUNT", 100);
         cursor = nextCursor;
-        console.log("Keys", keys);
         if (keys.length > 0) {
           // xóa prefix vì ioredis tự động thêm keyPrefix cho del()
           const cleanKeys = keys.map(k => k.replace(redis.options.keyPrefix, ""));
