@@ -1,59 +1,71 @@
-import prisma from "../prismaClient.js";
+import prisma from '../db/prismaClient.js';
+import { RedisCache } from '#shared/utils/index.js';
+
+const patterns = ["student:list:*", "student:count:*"];
 
 class StudentRepository {
   constructor(prismaClient) {
     this.prisma = prismaClient;
   }
 
+  // Count students
   async count(filter = {}) {
-    return await this.prisma.student.count({
-      where: filter,
-    });
+    const key = `student:count:${JSON.stringify(filter)}`;
+    return await RedisCache.cacheRead(key, () =>
+      this.prisma.student.count({ where: filter })
+    );
   }
 
-  // Lấy danh sách student (có filter, skip, take)
+  // Lấy danh sách student (filter, skip, take)
   async findMany(filter = {}, options = {}) {
-    return await this.prisma.student.findMany({
-      where: filter,
-      skip: options.skip,
-      take: options.take,
-      orderBy: options.orderBy,
-    });
+    const key = RedisCache.generateKey("student:list", { filter, options });
+    return await RedisCache.cacheRead(key, () =>
+      this.prisma.student.findMany({
+        where: filter,
+        skip: options.skip,
+        take: options.take,
+        orderBy: options.orderBy,
+      })
+    );
   }
 
+  // Lấy student theo id
   async findById(id) {
-    return await this.prisma.student.findUnique({
-      where: { student_id: id },
-    });
+    const key = `student:${id}`;
+    return await RedisCache.cacheRead(key, () =>
+      this.prisma.student.findUnique({
+        where: { student_id: id },
+      })
+    );
   }
 
-  async findOne(filter = {}) {
-    return await this.prisma.student.findFirst({
-      where: filter,
-    });
-  }
-
+  // Tạo student mới
   async createOne(data) {
-    return await this.prisma.student.create({ data: data });
+    return await RedisCache.cacheWrite("", (payload) =>
+      this.prisma.student.create({ data: payload }),
+      data, patterns
+    );
   }
 
+  // Update student
   async updateById(id, data) {
-    return await this.prisma.student.update({
-      where: { student_id: id },
-      data: data,
-    });
+    const key = `student:${id}`;
+    return await RedisCache.cacheWrite(key, (payload) =>
+      this.prisma.student.update({
+        where: { student_id: id },
+        data: payload,
+      }),
+      data, patterns
+    );
   }
 
+  // Delete student
   async deleteById(id) {
-    return await this.prisma.student.delete({
-      where: { student_id: id },
-    });
-  }
-
-  async deleteMany(ids) {
-    return await this.prisma.student.delete({
-      where: { student_id: { in: ids } },
-    });
+    const key = `student:${id}`;
+    return await RedisCache.cacheWrite(key, () =>
+      this.prisma.student.delete({ where: { student_id: id } }),
+      {}, patterns
+    );
   }
 }
 
