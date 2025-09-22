@@ -1,0 +1,85 @@
+import redis from '../../db/redis.js';
+import crypto from "crypto";
+import { logger } from "#shared/utils/index.js";
+
+const DEFAULT_TTL = 3600;
+const REFRESH_THRESHOLD = 300;
+
+export default class RedisCache {
+  // Hàm hash cho key truyền vào JSON, tránh json escapse
+  static generateKey(prefix, obj = {}) {
+    const hash = crypto.createHash("md5")
+      .update(JSON.stringify(obj))
+      .digest("hex");
+    return `${prefix}:${hash}`;
+  }
+
+  static async refreshAhead(key, fetchFn, ttl = DEFAULT_TTL) {
+    try {
+      const data = await fetchFn();
+      if (data) {
+        await redis.set(key, JSON.stringify(data), "EX", ttl);
+      }
+    } catch (error) {
+      logger.error("Redis refefresh ahead error: ", error);
+    }
+  }
+
+  static async cacheRead(key, fetchFn, ttl = DEFAULT_TTL) {
+    const cached = await redis.get(key)
+
+    if (cached) {
+      // Nếu TTL sắp hết thì refresh ahead
+      const timeLeft = await redis.ttl(key);
+      if (timeLeft > 0 & timeLeft <= REFRESH_THRESHOLD) {
+        this.refreshAhead(key, fetchFn, ttl);
+      }
+
+      return JSON.parse(cached);
+    }
+
+    // Cache miss -> lấy từ DB
+    const data = await fetchFn();
+    await redis.set(key, JSON.stringify(data), "EX", ttl);
+
+    return data;
+  }
+
+  // xóa cache theo pattern cho findMany khi write (batch 100)
+  static async deleteByPattern(pattern) {
+    try {
+      let cursor = "0";
+      const prefix = redis.options.keyPrefix || "";
+      const fullPattern = `${prefix}${pattern}`;
+
+      do {
+        // lấy các keys match với pattern bằng redis.scan
+        const [nextCursor, keys] = await redis.scan(cursor, "MATCH", fullPattern, "COUNT", 100);
+        cursor = nextCursor;
+        console.log("Keys", keys);
+        if (keys.length > 0) {
+          // xóa prefix vì ioredis tự động thêm keyPrefix cho del()
+          const cleanKeys = keys.map(k => k.replace(redis.options.keyPrefix, ""));
+          await redis.del(cleanKeys);
+        }
+      } while (cursor !== "0");
+    } catch (error) {
+      logger.error("Redis deleteByPattern error: ", error);
+    }
+  }
+
+  static async cacheWrite(key = "", writeFn, payload, invalidatePattern = []) {
+    const data = await writeFn(payload);
+
+    if (key) {
+      await redis.del(key);
+    }
+
+    // Xóa tất cả keys match pattern, reset key cho findMany
+    for (const pattern of invalidatePattern) {
+      await this.deleteByPattern(pattern);
+    }
+
+    return data;
+  }
+}

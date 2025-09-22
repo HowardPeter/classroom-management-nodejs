@@ -1,5 +1,5 @@
 // Chuẩn hóa các field nhiều giá trị
-export class Nomalizer {
+export default class Nomalizer {
   // Chuẩn hóa lọc query field Enum (chuyển thành ký tự hoa)
   static enum(key, value, filter) {
     if (Array.isArray(value)) {
