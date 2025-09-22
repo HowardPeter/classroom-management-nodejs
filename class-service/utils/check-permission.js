@@ -2,8 +2,10 @@ import UserClassRepository from "../repositories/userClassRepository.js";
 
 export const checkPermission = async (userId, classId, allowedRoles = []) => {
   const userClass = await UserClassRepository.findOne({
-    user_id: userId,
-    class_id: classId,
+    class_id_user_id: {
+      class_id: classId,
+      user_id: userId
+    }
   });
 
   if (!userClass) return false;
