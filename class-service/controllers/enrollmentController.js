@@ -39,8 +39,10 @@ export const addStudentToClass = asyncWrapper(async (req, res) => {
   }
 
   const hasEnrollment = await EnrollmentRepository.findOne({
-    class_id: classId,
-    student_id: studentId
+    student_id_class_id: {
+      student_id: studentId,
+      class_id: classId,
+    }
   })
   if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 
@@ -68,8 +70,10 @@ export const changeStudentClass = asyncWrapper(async (req, res) => {
   await StudentServiceClient.getStudentById(studentId, token);
 
   const hasEnrollment = await EnrollmentRepository.findOne({
-    class_id: newClassId,
-    student_id: studentId
+    student_id_class_id: {
+      student_id: studentId,
+      class_id: newClassId,
+    }
   })
   if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 
@@ -77,7 +81,7 @@ export const changeStudentClass = asyncWrapper(async (req, res) => {
     student_id_class_id: {
       student_id: studentId,
       class_id: oldClassId,
-    },
+    }
   }, { class_id: newClassId });
 
   res.status(200).json({
@@ -95,8 +99,10 @@ export const removeStudentFromClass = asyncWrapper(async (req, res) => {
   await StudentServiceClient.getStudentById(studentId, token);
 
   const enrollment = await EnrollmentRepository.findOne({
-    student_id: studentId,
-    class_id: classId
+    student_id_class_id: {
+      student_id: studentId,
+      class_id: classId,
+    }
   });
 
   if (!enrollment) {
@@ -106,9 +112,7 @@ export const removeStudentFromClass = asyncWrapper(async (req, res) => {
     });
   }
 
-  await EnrollmentRepository.deleteOne({
-    id: enrollment.id
-  });
+  await EnrollmentRepository.deleteOne({ id: enrollment.id });
 
   res.status(200).json({
     success: true,

@@ -53,8 +53,10 @@ export const addUserClass = asyncWrapper(async (req, res) => {
   }
 
   const hasUser = await UserClassRepository.findOne({
-    class_id: classId,
-    user_id: user_id
+    class_id_user_id: {
+      class_id: classId,
+      user_id: user_id
+    }
   })
   if (hasUser) throw new ConflictError("This user has a role in the class!");
 
@@ -115,8 +117,10 @@ export const joinClass = asyncWrapper(async (req, res) => {
   if (!userId) throw new NotFoundError("Cannot get user Id!");
 
   const hasUser = await UserClassRepository.findOne({
-    class_id: classId,
-    user_id: userId
+    class_id_user_id: {
+      class_id: classId,
+      user_id: userId
+    }
   })
   if (hasUser) throw new ConflictError("You had a role in this class!");
 
@@ -133,15 +137,17 @@ export const joinClass = asyncWrapper(async (req, res) => {
 })
 
 export const leaveClass = asyncWrapper(async (req, res) => {
-  const { class_id } = req.params.id;
+  const { class_id: classId } = req.params.id;
   const userId = req.user.userId;
 
   if (!userId) throw new NotFoundError("Cannot get user Id!");
 
-  await UserClassRepository.deleteMany({
-    class_id: class_id,
-    user_id: userId
-  })
+  await UserClassRepository.deleteOne({
+    class_id_user_id: {
+      class_id: classId,
+      user_id: userId
+    }
+  });
 
   res.status(201).json({
     success: true,
@@ -156,8 +162,10 @@ export const checkUserClass = asyncWrapper(async (req, res) => {
   if (!classId || !userId) throw new BadRequestError("Class Id and User Id are required!");
 
   const userClass = await UserClassRepository.findOne({
-    user_id: userId,
-    class_id: classId,
+    class_id_user_id: {
+      class_id: classId,
+      user_id: userId
+    }
   });
 
   res.status(200).json(userClass);
