@@ -73,9 +73,11 @@ export const changeStudentClass = asyncWrapper(async (req, res) => {
   })
   if (hasEnrollment) throw new ConflictError("This student has enrolled the class!");
 
-  const result = await EnrollmentRepository.updateMany({
-    student_id: studentId,
-    class_id: oldClassId
+  const result = await EnrollmentRepository.updateOne({
+    student_id_class_id: {
+      student_id: studentId,
+      class_id: oldClassId,
+    },
   }, { class_id: newClassId });
 
   res.status(200).json({
@@ -104,9 +106,8 @@ export const removeStudentFromClass = asyncWrapper(async (req, res) => {
     });
   }
 
-  await EnrollmentRepository.deleteMany({
-    student_id: studentId,
-    class_id: classId
+  await EnrollmentRepository.deleteOne({
+    id: enrollment.id
   });
 
   res.status(200).json({

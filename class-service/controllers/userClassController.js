@@ -73,9 +73,11 @@ export const changeUserClass = asyncWrapper(async (req, res) => {
 
   if (!role) throw new BadRequestError("New role is required!");
 
-  const result = await UserClassRepository.updateMany({
-    class_id: classId,
-    user_id: userId
+  const result = await UserClassRepository.updateOne({
+    class_id_user_id: {
+      class_id: classId,
+      user_id: userId
+    }
   }, { role: role });
 
   if (result.count === 0) throw new NotFoundError("User has no role in the class!");
@@ -93,9 +95,11 @@ export const removeUserClass = asyncWrapper(async (req, res) => {
   if (!userClasses || userClasses.length === 0) throw new NotFoundError("Class not found or has no users");
   if (userClasses.length === 1) throw new BadRequestError("Cannot delete the last manager account in the class!");
 
-  await UserClassRepository.deleteMany({
-    user_id: userId,
-    class_id: classId
+  await UserClassRepository.deleteOne({
+    class_id_user_id: {
+      class_id: classId,
+      user_id: userId
+    }
   });
 
   res.status(200).json({
