@@ -1,42 +1,68 @@
 import BaseRepository from "./BaseRepository.js";
-import prisma from "../prismaClient.js";
+import prisma from "../db/prismaClient.js";
 import { getMonthRange } from "../utils/index.js";
+import { RedisCache } from '#shared/utils/index.js';
 
 class InvoiceRepository extends BaseRepository {
   constructor() {
-    super(prisma.invoice);
+    super(prisma.invoice, "invoice");
   }
 
-  async findById(id) {
-    return await this.model.findUnique({
-      where: { invoice_id: id },
-      include: {
-        payments: true
-      },
-    });
+  // Xóa các key "payment" phụ thuộc invoiceId
+  relatedPatterns(invoiceId) {
+    return [
+      `payment:list:${invoiceId}`,
+      `payment:sum:${invoiceId}`,
+    ];
+  }
+
+  async findById(invoiceId) {
+    const key = this.buildKey(`one:${invoiceId}`);
+    return await RedisCache.cacheRead(key, () =>
+      this.model.findUnique({
+        where: { invoice_id: invoiceId },
+        include: {
+          payments: true
+        },
+      })
+    )
   }
 
   async findByMonth(classId, year, month) {
-    return await this.model.findMany({
-      where: {
-        class_id: classId,
-        due_date: getMonthRange(year, month),
-        NOT: {
-          status: "CANCELLED"
-        }
-      },
-      include: {
-        payments: true
-      }
-    })
+    const key = this.buildKey(`list:${classId}/${year}-${month}`);
+    return await RedisCache.cacheRead(key, () =>
+      this.model.findMany({
+        where: {
+          class_id: classId,
+          due_date: getMonthRange(year, month),
+          NOT: {
+            status: "CANCELLED"
+          }
+        },
+        include: { payments: true }
+      })
+    )
   }
 
-  async updateById(id, data) {
-    return await super.updateById("invoice_id", id, data);
+  async updateById(invoiceId, data) {
+    const key = this.buildKey(`one:${invoiceId}`);
+    return await RedisCache.cacheWrite(key, (payload) =>
+      this.model.update({
+        where: { invoice_id: invoiceId },
+        data: payload,
+      }),
+      data, [...this.patterns(), ...this.relatedPatterns(invoiceId)]
+    )
   }
 
-  async deleteById(id) {
-    return await super.deleteById("invoice_id", id);
+  async deleteById(invoiceId) {
+    const key = this.buildKey(`one:${invoiceId}`);
+    return await RedisCache.cacheWrite(key, () =>
+      this.model.delete({
+        where: { invoice_id: invoiceId },
+      }),
+      {}, [...this.patterns(), ...this.relatedPatterns(invoiceId)]
+    )
   }
 }
 
