@@ -35,12 +35,14 @@ export default class RedisCache {
         this.refreshAhead(key, fetchFn, ttl);
       }
 
+      logger.info(`[CACHE HIT] key = ${key}`);
       return JSON.parse(cached);
     }
 
     // Cache miss -> lấy từ DB
     const data = await fetchFn();
     await redis.set(key, JSON.stringify(data), "EX", ttl);
+    logger.info(`[CACHE SET] key = ${key}, ttl = ${ttl}s`);
 
     return data;
   }
@@ -56,14 +58,21 @@ export default class RedisCache {
         // lấy các keys match với pattern bằng redis.scan
         const [nextCursor, keys] = await redis.scan(cursor, "MATCH", fullPattern, "COUNT", 100);
         cursor = nextCursor;
+
         if (keys.length > 0) {
+          logger.info(`[CACHE DEL PATTERN] pattern = ${pattern}, matched = ${keys}`);
+
           // xóa prefix vì ioredis tự động thêm keyPrefix cho del()
-          const cleanKeys = keys.map(k => k.replace(redis.options.keyPrefix, ""));
-          await redis.del(cleanKeys);
+          const cleanKeys = keys.map(k => k.replace(prefix, ""));
+
+          if (cleanKeys.length > 0) {
+            await redis.del(...cleanKeys);
+            logger.info(`[CACHE DEL DONE] keys deleted = ${cleanKeys}`);
+          }
         }
       } while (cursor !== "0");
     } catch (error) {
-      logger.error("Redis deleteByPattern error: ", error);
+      logger.error(`Redis deleteByPattern error: ${error.message}`, { stack: error.stack });
     }
   }
 
@@ -71,12 +80,18 @@ export default class RedisCache {
     const data = await writeFn(payload);
 
     if (key) {
+      logger.info(`[CACHE DEL DIRECT] key = ${key}`);
       await redis.del(key);
     }
 
     // Xóa tất cả keys match pattern, reset key cho findMany
     for (const pattern of invalidatePattern) {
-      await this.deleteByPattern(pattern);
+      if (pattern.includes("*")) {
+        await this.deleteByPattern(pattern);
+      } else {
+        logger.info(`[CACHE DEL DIRECT] key = ${pattern}`);
+        await redis.del(pattern);
+      }
     }
 
     return data;
