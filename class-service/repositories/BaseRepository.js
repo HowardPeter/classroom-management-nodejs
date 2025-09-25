@@ -15,7 +15,6 @@ class BaseRepository {
     return [
       this.buildKey("list:*"),
       this.buildKey("count:*"),
-      this.buildKey("one:*"),
     ];
   }
 
@@ -42,15 +41,6 @@ class BaseRepository {
         take: options.take,
         orderBy: options.orderBy,
         include: options.include || undefined
-      })
-    )
-  }
-
-  async findByClassId(classId) {
-    const key = this.buildKey(`list:${classId}`)
-    return await RedisCache.cacheRead(key, () =>
-      this.model.findMany({
-        where: { class_id: classId }
       })
     )
   }

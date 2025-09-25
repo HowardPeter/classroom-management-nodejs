@@ -9,10 +9,20 @@ class EnrollmentRepository extends BaseRepository {
   patterns() {
     return [
       ...super.patterns(),
+      this.buildKey("one:*"),
       "class:one:*",
       "class:list:*",
       "class:count:*"
     ];
+  }
+
+  async findByClassId(classId) {
+    const key = this.buildKey(`list:${classId}`)
+    return await RedisCache.cacheRead(key, () =>
+      this.model.findMany({
+        where: { class_id: classId }
+      })
+    )
   }
 }
 

@@ -7,16 +7,6 @@ class ClassRepository extends BaseRepository {
     super(prisma.class, "class");
   }
 
-  patterns() {
-    return [
-      ...super.patterns(),
-      "userclass:one:*",
-      "userclass:list:*",
-      "enrollment:one:*",
-      "enrollment:list:*",
-    ];
-  }
-
   async findById(id) {
     const key = this.buildKey(`one:${id}`);
     return await RedisCache.cacheRead(key, () =>
