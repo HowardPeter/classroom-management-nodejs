@@ -17,7 +17,7 @@ const resharpImage = async (file) => {
 // GET /teachers
 // Lấy thông tin teacher theo filter
 export const getTeachers = asyncWrapper(async (req, res) => {
-  const { page = 1, limit = 10, orderBy = { full_name: "asc" }, ...rawFilters } = req.query;
+  const { page = 1, limit = 10, orderBy, ...rawFilters } = req.query;
 
   const filters = normalizeFilter(rawFilters);
 

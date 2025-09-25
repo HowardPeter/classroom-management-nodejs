@@ -28,7 +28,9 @@ model Enrollment {
   student_id      String
   class_id        String
 
-  class           Class    @relation(fields: [class_id], references: [class_id])
+  @@unique([student_id, class_id])
+
+  class           Class    @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
 }
 
 model UserClass {
@@ -37,7 +39,9 @@ model UserClass {
   user_id   String
   role      Role
 
-  class     Class    @relation(fields: [class_id], references: [class_id])
+  @@unique([class_id, user_id])
+
+  class     Class    @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
 }
 
 enum Role {

@@ -1,46 +1,52 @@
+import { RedisCache } from '#shared/utils/index.js';
+
 class BaseRepository {
-  constructor(model) {
+  constructor(model, prefixKey) {
     this.model = model;
+    this.prefixKey = prefixKey;
+  }
+
+  buildKey(suffix) {
+    return `${this.prefixKey}:${suffix}`;
+  }
+
+  patterns() {
+    return [
+      this.buildKey("list:*"),
+      this.buildKey("count:*"),
+    ];
+  }
+
+  // Xóa các key liên quan khi cache write
+  relatedPatterns(id) {
+    return [];
   }
 
   async count(filter = {}) {
-    return await this.model.count({
-      where: filter,
-    });
-  }
-  
-  async findOne(filter = {}, options = {}) {
-    return await this.model.findFirst({
-      where: filter,
-      include: options.include || undefined,
-    });
+    const key = this.buildKey(`count:${JSON.stringify(filter)}`);
+    return RedisCache.cacheRead(key, () =>
+      this.model.count({ where: filter })
+    )
   }
 
   async findMany(filter = {}, options = {}) {
-    return await this.model.findMany({
-      where: filter,
-      skip: options.skip,
-      take: options.take,
-      orderBy: options.orderBy,
-      include: options.include || undefined,
-    });
+    const key = RedisCache.generateKey(`${this.prefixKey}:list`, { filter, options });
+    return await RedisCache.cacheRead(key, () =>
+      this.model.findMany({
+        where: filter,
+        skip: options.skip,
+        take: options.take,
+        orderBy: options.orderBy,
+        include: options.include || undefined
+      })
+    )
   }
 
   async createOne(data) {
-    return await this.model.create({ data });
-  }
-
-  async updateById(idField, id, data) {
-    return await this.model.update({
-      where: { [idField]: id },
-      data,
-    });
-  }
-
-  async deleteById(idField, id) {
-    return await this.model.delete({
-      where: { [idField]: id },
-    });
+    return await RedisCache.cacheWrite("", (payload) =>
+      this.model.create({ data: payload }),
+      data, this.patterns()
+    );
   }
 }
 

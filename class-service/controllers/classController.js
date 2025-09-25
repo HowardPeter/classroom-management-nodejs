@@ -1,6 +1,5 @@
 import ClassRepository from '../repositories/classRepository.js'
 import UserClassRepository from '../repositories/userClassRepository.js'
-import EnrollmentRepository from '../repositories/enrollmentRepository.js'
 import { TeacherServiceClient } from '../api/index.js'
 import { asyncWrapper } from "#shared/middlewares/index.js"
 import { paginate, getBearer } from '#shared/utils/index.js'
@@ -111,10 +110,6 @@ export const deleteClass = asyncWrapper(async (req, res) => {
 
   const isClassExist = await ClassRepository.findById(classId);
   if (!isClassExist) throw new NotFoundError("Class not found. Check the Id again!");
-
-  // Xóa record liên quan
-  await EnrollmentRepository.deleteMany({ class_id: classId });
-  await UserClassRepository.deleteMany({ class_id: classId });
 
   await ClassRepository.deleteById(classId);
 

@@ -55,12 +55,10 @@ export const createPayment = asyncWrapper(async (req, res) => {
   if (paymentData.method) paymentData.method = paymentData.method.toUpperCase();
 
   // Kiểm tra invoice tồn tại
-  const invoice = await InvoiceRepository.findOne({ invoice_id: invoiceId }, {
-    include: { payments: true }
-  });
+  const invoice = await InvoiceRepository.findById(invoiceId);
   if (!invoice) throw new NotFoundError("Invoice not found!");
 
-  // Trả về nêu invoice status = CANCELLED
+  // Trả về nếu invoice status = CANCELLED
   if(invoice.status === "CANCELLED") throw new ForbiddenError("Cancelled invoice cannot be modified!");
 
   // Trả về nếu invoice đã PAID
@@ -90,7 +88,7 @@ export const createPayment = asyncWrapper(async (req, res) => {
 export const deletePayment = asyncWrapper(async (req, res) => {
   const { paymentId } = req.params;
 
-  const payment = await PaymentRepository.findOne({ payment_id: paymentId });
+  const payment = await PaymentRepository.findById(paymentId);
   if (!payment) throw new NotFoundError("Payment not found!");
 
   const invoiceId = payment.invoice_id;

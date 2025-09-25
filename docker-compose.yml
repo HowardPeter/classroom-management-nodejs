@@ -1,4 +1,18 @@
 services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--requirepass", "secretredispassword"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "secretredispassword", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   user-db:
     image: mongo
     ports:
@@ -8,6 +22,12 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: secret
     volumes:
       - user-data:/data/db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongo", "admin", "-u", "admin", "-p", "secret", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   student-db:
     image: postgres:17-alpine
@@ -17,6 +37,12 @@ services:
       POSTGRES_DB: studentdb
     volumes:
       - student_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d studentdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   class-db:
     image: postgres:17-alpine
@@ -26,6 +52,12 @@ services:
       POSTGRES_DB: classdb
     volumes:
       - class_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d classdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   tuition-db:
     image: postgres:17-alpine
@@ -35,6 +67,12 @@ services:
       POSTGRES_DB: tuitiondb
     volumes:
       - tuition_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d tuitiondb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   teacher-db:
     image: postgres:17-alpine
@@ -44,6 +82,12 @@ services:
       POSTGRES_DB: teacherdb
     volumes:
       - teacher_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d teacherdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   auth:
     build:
@@ -81,6 +125,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
       - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - ./student-service/.env
     depends_on:
       - student-db
       - auth
@@ -99,6 +145,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
       - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - ./class-service/.env
     depends_on:
       - class-db
       - auth
@@ -117,6 +165,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
       - CHOKIDAR_USEPOLLING=true
+    env_file:
+      - ./tuition-service/.env
     depends_on:
       - tuition-db
       - auth
@@ -142,6 +192,7 @@ services:
       - auth
 
 volumes:
+  redis_data:
   user-data:
   student_data:
   class_data:

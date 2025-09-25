@@ -1,9 +1,28 @@
 import BaseRepository from "./BaseRepository.js";
-import prisma from '../prismaClient.js';
+import prisma from '../db/prismaClient.js';
 
 class UserClassRepository extends BaseRepository {
   constructor() {
-    super(prisma.userClass);
+    super(prisma.userClass, "userclass");
+  }
+
+  patterns() {
+    return [
+      ...super.patterns(),
+      this.buildKey("one:*"),
+      "class:one:*",
+      "class:list:*",
+      "class:count:*"
+    ];
+  }
+
+  async findByClassId(classId) {
+    const key = this.buildKey(`list:${classId}`)
+    return await RedisCache.cacheRead(key, () =>
+      this.model.findMany({
+        where: { class_id: classId }
+      })
+    )
   }
 }
 

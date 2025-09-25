@@ -1,0 +1,27 @@
+config:
+  target: "http://localhost:3002/students"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+  defaults:
+    headers:
+      Authorization: "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGNkYmMwZWI5MWY2YTdmMmU0YmYwYjYiLCJpYXQiOjE3NTgzMTczMzEsImV4cCI6MTc1ODMyMDkzMX0.AJ7HtWphBuhHAG15OpM0PV6lxZwc5kJK422BZvZt9rbF65mrpkR34T-0Ir2WqRiGZCOooCSpc7sb787IwZJFd76uPhuJs1zInzwj9Ye-asinU0g-I2vUY7JkLBmpPAdzpmeHZFUfEYERo778GSkf5I3bCz_us-MW4qtf4QihN95NLv_Z-MQ7xCvHQbS6dhkYj12VUGJ4iIxxFs1I5oF064RFAKvX_AFgTDO3I-L5qioPOvY2pa5aqefOIR8SokkgQYvrpc19zwrXlBtdsRjp2V0Dhvyxx2vgzUfOulAfxEsB24hLLu0O3ZWab03a6yn9XLNFicN8HzcnyJiA92No8g"
+scenarios:
+  - flow:
+      - get:
+          url: "/?email=vana&email=vanc&phone=09"
+      - get:
+          url: "/f8f3f9ae-0948-4a04-bed9-3ddfc960b9d3"
+      # - post:
+      #     url: "/"
+      #     json:
+      #       full_name: "Nguyen Bench Mark"
+      #       date_of_birth: "2000-01-01"
+      #       phone: "0923456123"
+      #       email: "benchmark@example.com"
+      # - patch:
+      #     url: "/f8f3f9ae-0948-4a04-bed9-3ddfc960b9d3"
+      #     json:
+      #       full_name: "Nguyen Van ABC"
+      # - delete:
+      #     url: "/cdcc973f-2bfc-4708-9336-d12ff2fc11c8"
