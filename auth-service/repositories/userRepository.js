@@ -1,10 +1,17 @@
 import mongoose from "mongoose";
 import { User } from "../models/Models.js";
-import BaseRepository from "./BaseRepository.js";
 
-class UserRepository extends BaseRepository {
-  constructor() {
-    super(User)
+class UserRepository {
+  constructor(model) {
+    this.model = model;
+  }
+
+  async findOne(filter = {}) {
+    return await this.model.findOne(filter);
+  }
+
+  async createOne(data) {
+    return await this.model.create(data);
   }
 
   async updatePasswordById(id, newPassword) {
@@ -27,6 +34,10 @@ class UserRepository extends BaseRepository {
       options
     );
   }
+
+  async deleteById(id) {
+    return await this.model.deleteOne({ _id: id })
+  }
 }
 
-export default new UserRepository;
+export default new UserRepository(User);
