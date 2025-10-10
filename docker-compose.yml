@@ -1,14 +1,14 @@
 services:
   redis:
     image: redis:7-alpine
-    command: ["redis-server", "--requirepass", "secretredispassword"]
+    command: ["redis-server"]
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "secretredispassword", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,7 +24,18 @@ services:
       - user-data:/data/db
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "mongo", "admin", "-u", "admin", "-p", "secret", "--eval", "db.adminCommand('ping')"]
+      test:
+        [
+          "CMD",
+          "mongo",
+          "admin",
+          "-u",
+          "admin",
+          "-p",
+          "secret",
+          "--eval",
+          "db.adminCommand('ping')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -94,14 +105,16 @@ services:
       context: .
       dockerfile: auth-service/Dockerfile
       target: development
+    image: classroom-user:dev
+    container_name: user
     ports:
-      - '3001:3001'
+      - "3001:3001"
     volumes:
       - ./auth-service:/app:delegated
       - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     env_file:
-      - './auth-service/.env'
+      - "./auth-service/.env"
     environment:
       - MONGO_USERNAME=admin
       - MONGO_PASSWORD=secret
@@ -116,14 +129,17 @@ services:
       context: .
       dockerfile: student-service/Dockerfile
       target: development
+    image: classroom-student:dev
+    container_name: student
     ports:
-      - '3002:3002'
+      - "3002:3002"
     volumes:
       - ./student-service:/app:delegated
       - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
+      - DIRECT_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
       - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./student-service/.env
@@ -136,14 +152,17 @@ services:
       context: .
       dockerfile: class-service/Dockerfile
       target: development
+    image: classroom-class:dev
+    container_name: class
     ports:
-      - '3003:3003'
+      - "3003:3003"
     volumes:
       - ./class-service:/app:delegated
       - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
+      - DIRECT_URL=postgresql://admin:secret@student-db:5432/classdb?schema=public
       - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./class-service/.env
@@ -156,14 +175,17 @@ services:
       context: .
       dockerfile: tuition-service/Dockerfile
       target: development
+    image: classroom-tuition:dev
+    container_name: tuition
     ports:
-      - '3004:3004'
+      - "3004:3004"
     volumes:
       - ./tuition-service:/app:delegated
       - ./shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
+      - DIRECT_URL=postgresql://admin:secret@student-db:5432/tuitiondb?schema=public
       - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./tuition-service/.env
@@ -176,8 +198,10 @@ services:
       context: .
       dockerfile: teacher-service/Dockerfile
       target: development
+    image: classroom-teacher:dev
+    container_name: teacher
     ports:
-      - '3005:3005'
+      - "3005:3005"
     volumes:
       - ./teacher-service:/app:delegated
       - ./shared-libs:/app/shared-libs:delegated
@@ -186,6 +210,7 @@ services:
       - ./teacher-service/.env
     environment:
       - DATABASE_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
+      - DIRECT_URL=postgresql://admin:secret@student-db:5432/teacherdb?schema=public
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - teacher-db
