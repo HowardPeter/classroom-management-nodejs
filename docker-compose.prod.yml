@@ -1,0 +1,91 @@
+# Docker compose dùng cho test database hosting
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_db:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+      target: production
+    image: classroom-user:prod
+    container_name: user-prod
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./auth-service/.env
+      - ./env-prod/.env.user
+
+  student:
+    build:
+      context: .
+      dockerfile: student-service/Dockerfile
+      target: production
+    image: classroom-student:prod
+    container_name: student-prod
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./student-service/.env
+      - ./env-prod/.env.student
+    depends_on:
+      - user
+
+  class:
+    build:
+      context: .
+      dockerfile: class-service/Dockerfile
+      target: production
+    image: classroom-class:prod
+    container_name: class-prod
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./class-service/.env
+      - ./env-prod/.env.class
+    depends_on:
+      - user
+
+  tuition:
+    build:
+      context: .
+      dockerfile: tuition-service/Dockerfile
+      target: production
+    image: classroom-tuition:prod
+    container_name: tuition-prod
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./tuition-service/.env
+      - ./env-prod/.env.tuition
+    depends_on:
+      - user
+
+  teacher:
+    build:
+      context: .
+      dockerfile: teacher-service/Dockerfile
+      target: production
+    image: classroom-teacher:prod
+    container_name: teacher-prod
+    ports:
+      - "3005:3005"
+    env_file:
+      - ./teacher-service/.env
+      - ./env-prod/.env.teacher
+    depends_on:
+      - user
+
+volumes:
+  redis_data:
