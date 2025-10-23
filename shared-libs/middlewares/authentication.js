@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken'
-import { UnauthorizedError } from '#shared/errors/errors.js';
 import fs from 'fs';
+import { UnauthorizedError } from '#shared/errors/errors.js';
+import { SecretService } from "#shared/utils/index.js"
 
-export default function authentication(req, res, next) {
+export default async function authentication(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader)
@@ -13,8 +14,12 @@ export default function authentication(req, res, next) {
   if (!token)
     return res.status(401).json({ message: "Token missing!" });
 
-  const publicKey = fs.readFileSync("public.pem", "utf8");
-  jwt.verify(token, publicKey, { algorithms: ["RS256"] }, (err, user) => {
+  // NOTE: RSA key cần xuống dòng đúng để RS256 verify hợp lệ, key lưu ở AWS Secret Manager NHẬP BẰNG PLAINTEXT, chuyển thành 1 dòng và \n ở nơi xuống dòng
+  // NOTE: {"PUBLIC_KEY": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A\n...-----END PUBLIC KEY-----"}
+  const secret = await SecretService.getSecret("prod/cr-publickey");
+  const publickey = secret.PUBLIC_KEY || fs.readFileSync("public.pem", "utf8");
+
+  jwt.verify(token, publickey, { algorithms: ["RS256"] }, (err, user) => {
     if (err) {
       return next(err)
     }
