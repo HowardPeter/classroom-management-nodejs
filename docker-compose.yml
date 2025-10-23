@@ -162,7 +162,7 @@ services:
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
-      - DIRECT_URL=postgresql://admin:secret@student-db:5432/classdb?schema=public
+      - DIRECT_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
       - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./class-service/.env
@@ -185,7 +185,7 @@ services:
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
-      - DIRECT_URL=postgresql://admin:secret@student-db:5432/tuitiondb?schema=public
+      - DIRECT_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
       - CHOKIDAR_USEPOLLING=true
     env_file:
       - ./tuition-service/.env
@@ -210,7 +210,7 @@ services:
       - ./teacher-service/.env
     environment:
       - DATABASE_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
-      - DIRECT_URL=postgresql://admin:secret@student-db:5432/teacherdb?schema=public
+      - DIRECT_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - teacher-db
