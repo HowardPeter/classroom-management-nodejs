@@ -1,7 +1,7 @@
 import axios from "axios";
 import { InternalServerError } from "#shared/errors/errors.js";
 
-const URL = "http://student:3002/students";
+const URL = process.env.STUDENT_SERVICE_URL;
 
 class StudentServiceClient {
   constructor(baseURL) {

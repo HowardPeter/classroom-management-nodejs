@@ -1,7 +1,7 @@
 import axios from "axios";
 import { InternalServerError } from "#shared/errors/errors.js";
 
-const URL = "http://auth:3001/users"
+const URL = process.env.USER_SERVICE_URL;
 
 class UserServiceClient {
   constructor(baseURL) {
