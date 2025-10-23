@@ -1,4 +1,4 @@
-import BaseRepository from "./BaseRepository.js";
+import BaseRepository from "./baseRepository.js";
 import prisma from "../db/prismaClient.js";
 import { RedisCache } from '#shared/utils/index.js';
 

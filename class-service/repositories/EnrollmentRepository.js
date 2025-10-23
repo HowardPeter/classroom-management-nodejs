@@ -1,4 +1,4 @@
-import BaseRepository from "./BaseRepository.js";
+import BaseRepository from "./baseRepository.js";
 import prisma from '../db/prismaClient.js';
 
 class EnrollmentRepository extends BaseRepository {
