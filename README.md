@@ -16,8 +16,10 @@ This system consists of 5 microservices:
 
 - **Backend**: Node.js, Express.js
 - **Databases**: MongoDB (Auth), PostgreSQL (Students, Classes, Teachers, Tuition)
+- **Caching**: Redis (Database caching)
 - **ORM**: Prisma (PostgreSQL services), Mongoose (MongoDB)
 - **Authentication**: JWT with RSA keys
+- **Secret Management**: AWS Secrets Manager
 - **Containerization**: Docker & Docker Compose
 - **Storage**: AWS S3 Bucket (profile image)
 - **CI/CD**: GitHub Actions
@@ -56,6 +58,7 @@ docker-compose logs -f
 The system uses multiple databases:
 
 - **MongoDB** (Port 27017) - User authentication data
+- **Redis** (Port 6379) - Database caching
 - **PostgreSQL** instances for each service:
   - Student DB (studentdb)
   - Class DB (classdb)
