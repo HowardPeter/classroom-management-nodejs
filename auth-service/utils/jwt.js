@@ -1,14 +1,14 @@
 import jwt from "jsonwebtoken"
-import dotenv from 'dotenv'
 import fs from 'fs'
+import { SecretService } from "#shared/utils/index.js"
 
-dotenv.config()
+const secret = await SecretService.getSecret("prod/cr-user-sv");
 
 export default class JwtFacade {
-  static ACCESS_TOKEN_SECRET = fs.readFileSync("private.pem", "utf8");;
-  static REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
-  static accessTokenExpiry = '1h';
-  static refreshTokenExpiry = '7d';
+  static ACCESS_TOKEN_SECRET = secret.PRIVATE_KEY || fs.readFileSync("private.pem", "utf8");
+  static REFRESH_TOKEN_SECRET = secret.REFRESH_TOKEN_SECRET || process.env.REFRESH_TOKEN_SECRET;
+  static accessTokenExpiry = process.env.ACCESS_TOKEN_EXPIRY || '1h';
+  static refreshTokenExpiry = process.env.REFRESH_TOKEN_EXPIRY || '7d';
 
   static verifyToken(token, secret, options = {}) {
     return jwt.verify(token, secret, options);

@@ -1,10 +1,18 @@
 import mongoose from "mongoose"
 import { InternalServerError } from "#shared/errors/errors.js";
-import dotenv from 'dotenv'
+import { SecretService } from "#shared/utils/index.js"
 
-dotenv.config();
+const secret = await SecretService.getSecret("prod/cr-user-sv");
 
-const MONGO_URL=`mongodb://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:27017/${process.env.MONGO_DB}?authSource=admin`
+const MONGO_USERNAME = secret.MONGO_USERNAME || process.env.MONGO_USERNAME;
+const MONGO_PASSWORD = secret.MONGO_PASSWORD || process.env.MONGO_PASSWORD;
+const MONGO_HOST = secret.MONGO_HOST || process.env.MONGO_HOST;
+const MONGO_DB = secret.MONGO_DB || process.env.MONGO_DB;
+
+const MONGO_URL = process.env.NODE_ENV === "production" ?
+  `mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority`
+  :
+  `mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST}:27017/${MONGO_DB}?authSource=admin`
 
 class DbConnect {
   static instance = null;
@@ -17,12 +25,12 @@ class DbConnect {
       DbConnect.connecting = mongoose.connect(MONGO_URL)
         .then((conn) => {
           DbConnect.instance = conn;
-          console.log("Mongodb connected successfully")
+          console.log(`Mongodb connected successfully. Mode: ${process.env.NODE_ENV}`)
           return conn;
         })
         .catch(err => {
           DbConnect.connecting = null;
-          throw new InternalServerError(err.message);
+          throw new InternalServerError("MongoDB connection failed: ", err.message);
         })
     }
 

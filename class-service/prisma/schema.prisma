@@ -9,43 +9,50 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas = ["class"]
 }
 
 model Class {
-  class_id        String   @id @default(uuid())
-  teacher_id      String?
-  class_name      String
-  schedule        Json?
+  class_id   String  @id @default(uuid())
+  teacher_id String?
+  class_name String
+  schedule   Json?
 
-  enrollments     Enrollment[]
-  userClasses     UserClass[]
+  enrollments Enrollment[]
+  userClasses UserClass[]
+
+  @@schema("class")
 }
 
 model Enrollment {
-  id              String   @id @default(uuid())
-  student_id      String
-  class_id        String
+  id         String @id @default(uuid())
+  student_id String
+  class_id   String
+
+  class Class @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
 
   @@unique([student_id, class_id])
-
-  class           Class    @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
+  @@schema("class")
 }
 
 model UserClass {
-  id        String   @id @default(uuid())
-  class_id  String
-  user_id   String
-  role      Role
+  id       String @id @default(uuid())
+  class_id String
+  user_id  String
+  role     Role
+
+  class Class @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
 
   @@unique([class_id, user_id])
-
-  class     Class    @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
+  @@schema("class")
 }
 
 enum Role {
   owner
   manager
   viewer
+  @@schema("class")
 }

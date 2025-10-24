@@ -1,6 +1,5 @@
 import { RedisCache } from '#shared/utils/index.js';
 
-
 class BaseRepository {
   constructor(model, prefixKey) {
     this.model = model;

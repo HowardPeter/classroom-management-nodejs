@@ -22,14 +22,6 @@ export const token = asyncWrapper(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) throw new NotFoundError("No token in cookie!");
 
-  // check hash trong Redis có khớp refreshToken không
-  const storedHash = await TokenRepository.findRefreshHash(userId, sessionId);
-  const cookieHash = hashToken(refreshToken);
-  if (!storedHash || storedHash !== cookieHash) {
-    res.clearCookie("refreshToken");
-    throw new ForbiddenError("Invalid or expired token!");
-  }
-
   // decode token để lấy userId, sessionId
   const decoded = JwtFacade.decodeToken(refreshToken);
   if (!decoded || !decoded.userId || !decoded.sessionId) {
@@ -37,6 +29,14 @@ export const token = asyncWrapper(async (req, res) => {
     throw new ForbiddenError("Invalid token!");
   }
   const { userId, sessionId } = decoded;
+
+  // check hash trong Redis có khớp refreshToken không
+  const storedHash = await TokenRepository.findRefreshHash(userId, sessionId);
+  const cookieHash = hashToken(refreshToken);
+  if (!storedHash || storedHash !== cookieHash) {
+    res.clearCookie("refreshToken");
+    throw new ForbiddenError("Invalid or expired token!");
+  }
 
   // verify jwt
   try {

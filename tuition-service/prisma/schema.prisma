@@ -11,6 +11,8 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas = ["tuition"]
 }
 
 model Invoice {
@@ -26,6 +28,8 @@ model Invoice {
   updated_at       DateTime       @updatedAt
 
   payments         Payment[]
+
+  @@schema("tuition")
 }
 
 model Payment {
@@ -36,6 +40,8 @@ model Payment {
   paid_at    DateTime      @default(now())
 
   invoice    Invoice       @relation(fields: [invoice_id], references: [invoice_id], onDelete: Cascade)
+
+  @@schema("tuition")
 }
 
 enum InvoiceStatus {
@@ -44,6 +50,8 @@ enum InvoiceStatus {
   OVERDUE
   PARTIAL
   CANCELLED
+
+  @@schema("tuition")
 }
 
 enum PaymentMethod {
@@ -51,4 +59,6 @@ enum PaymentMethod {
   BANK
   MOMO
   OTHER
+
+  @@schema("tuition")
 }

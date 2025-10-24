@@ -1,5 +1,8 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "teacher";
+
 -- CreateTable
-CREATE TABLE "public"."Teacher" (
+CREATE TABLE "teacher"."Teacher" (
     "teacher_id" TEXT NOT NULL,
     "full_name" TEXT NOT NULL,
     "email" TEXT,
@@ -13,7 +16,7 @@ CREATE TABLE "public"."Teacher" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Teacher_email_key" ON "public"."Teacher"("email");
+CREATE UNIQUE INDEX "Teacher_email_key" ON "teacher"."Teacher"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Teacher_phone_key" ON "public"."Teacher"("phone");
+CREATE UNIQUE INDEX "Teacher_phone_key" ON "teacher"."Teacher"("phone");
