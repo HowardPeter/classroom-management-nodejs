@@ -8,10 +8,6 @@ export default class SecretService {
 
     const client = new SecretsManagerClient({
       region: "ap-southeast-1",
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      }
     });
     const res = await client.send(new GetSecretValueCommand({ SecretId: secretName }));
 
