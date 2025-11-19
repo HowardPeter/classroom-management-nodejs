@@ -24,6 +24,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "version_rule" {
     id     = "cleanup-old-versions"
     status = "Enabled"
 
+    filter {}
+
     # Chuyển version cũ sang storage class rẻ hơn (Glacier) sau 7 ngày
     noncurrent_version_transition {
       noncurrent_days = 7
@@ -45,6 +47,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "version_rule" {
   rule {
     id     = "transition-to-ia"
     status = "Enabled"
+
+    filter {}
 
     transition {
       days          = 30
@@ -106,9 +110,12 @@ data "aws_iam_policy_document" "bucket_policy" {
     sid = ""
     effect    = "Allow"
 
-    principals {
-      type        = "AWS"
-      identifiers = var.allowed_principals # IAM role ARN
+    dynamic "principals" {
+      for_each = length(var.allowed_principals) > 0 ? [1] : []
+      content {
+        type        = "AWS"
+        identifiers = var.allowed_principals # IAM Role ARN
+      }
     }
 
     actions = [
