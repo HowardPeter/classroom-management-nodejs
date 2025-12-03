@@ -1,13 +1,13 @@
 variable "aws_region" {
-  type = string
+  type    = string
   default = "ap-southeast-1"
 }
 
-# Variables chung
+# VARIABLES CHUNG
 variable "project_name" {
   description = "Project prefix name"
   type        = string
-  default     = "book-mg"
+  default     = "classroom-mg"
 }
 
 variable "tags" {
@@ -15,42 +15,62 @@ variable "tags" {
   type        = map(string)
   default = {
     Environment = "prod"
-    Project     = "book-mg"
+    Project     = "classroom-mg"
   }
 }
 
-# Network variables
-variable "vpc_cidr" {
-  description = "CIDR block for VPC"
-  type        = string
-  default     = "10.0.0.0/16"
+# SECRET MANAGER VARIABLES
+variable "auth" {
+  type = object({
+    mongo_username       = string
+    mongo_password       = string
+    mongo_host           = string
+    private_key          = string
+    refresh_token_secret = string
+  })
+  sensitive = true
 }
 
-variable "public_subnets" {
-  description = "Public subnet list"
-  type        = list(string)
-  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+# Student service secret value
+variable "student_db_url" {
+  type      = string
+  sensitive = true
 }
 
-variable "private_subnets" {
-  description = "Private subnet list"
-  type        = list(string)
-  default     = ["10.0.3.0/24", "10.0.4.0/24"]
+variable "student_direct_url" {
+  type      = string
+  sensitive = true
 }
 
-# S3 variables
-variable "name" {
-  type = string
-  default = "teacher-service"
+# Class service secret value
+variable "class_db_url" {
+  type      = string
+  sensitive = true
 }
 
-# variable "allowed_origins" {
-#   type = list(string)
-#   default = ["*"] # nên sửa thành domain frontend
-# }
+variable "class_direct_url" {
+  type      = string
+  sensitive = true
+}
 
-variable "allowed_principals" {
-  type        = list(string)
-  description = "IAM ARNs list for bucket upload permission (Lambda, API Gateway)"
-  default     = []
+# Teacher service secret value
+variable "teacher_db_url" {
+  type      = string
+  sensitive = true
+}
+
+variable "teacher_direct_url" {
+  type      = string
+  sensitive = true
+}
+
+# Tuition service secret value
+variable "tuition_db_url" {
+  type      = string
+  sensitive = true
+}
+
+variable "tuition_direct_url" {
+  type      = string
+  sensitive = true
 }

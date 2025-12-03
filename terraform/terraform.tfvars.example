@@ -1,0 +1,19 @@
+auth = {
+  mongo_username       = "your_mongo_username"
+  mongo_password       = "your_mongo_password"
+  mongo_host           = "your_mongo_host"
+  private_key          = ""
+  refresh_token_secret = "your_refresh_token_secret"
+}
+
+# Supabase PostgreSQL ORM connection strings
+student_db_url     = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
+student_direct_url = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
+
+class_db_url       = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
+
+teacher_db_url     = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
+teacher_direct_url = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
+
+tuition_db_url     = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
+tuition_direct_url = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
