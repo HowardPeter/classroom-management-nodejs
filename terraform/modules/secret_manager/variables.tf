@@ -1,5 +1,6 @@
 variable "project_name" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "tags" {
@@ -15,7 +16,7 @@ variable "supabase_services" {
   }))
 }
 
-variable "auth" {
+variable "auth_service" {
   type = object({
     mongo_username       = string
     mongo_password       = string
@@ -27,6 +28,6 @@ variable "auth" {
 }
 
 variable "public_key" {
-  type = string
+  type      = string
   sensitive = true
 }

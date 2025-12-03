@@ -22,8 +22,8 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnets) # Tạo nhiều subnet tùy theo số CIDR trong danh sách
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = var.public_subnets[count.index] # Tham chiếu đến CIDR tương ứng trong mảng cho từng subnet
-  map_public_ip_on_launch = true # Tự động gán IP public khi tạo EC2 (cho Public Subnet ra IGW)
+  cidr_block              = var.public_subnets[count.index]                          # Tham chiếu đến CIDR tương ứng trong mảng cho từng subnet
+  map_public_ip_on_launch = true                                                     # Tự động gán IP public khi tạo EC2 (cho Public Subnet ra IGW)
   availability_zone       = data.aws_availability_zones.available.names[count.index] # Mỗi subnet ở 1 AZ khác nhau
 
   tags = merge(var.tags, {
@@ -66,7 +66,7 @@ resource "aws_nat_gateway" "nat_gw" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
   route {
-    cidr_block = "0.0.0.0/0" # Mọi traffic ra ngoài
+    cidr_block = "0.0.0.0/0"                 # Mọi traffic ra ngoài
     gateway_id = aws_internet_gateway.igw.id # Thông qua Internet Gateway
   }
   tags = merge(var.tags, {

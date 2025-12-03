@@ -107,8 +107,8 @@ resource "aws_s3_bucket_policy" "policy" {
 
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
-    sid = ""
-    effect    = "Allow"
+    sid    = ""
+    effect = "Allow"
 
     dynamic "principals" {
       for_each = length(var.allowed_principals) > 0 ? [1] : []

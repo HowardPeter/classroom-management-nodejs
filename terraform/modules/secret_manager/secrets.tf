@@ -2,7 +2,7 @@
 resource "aws_secretsmanager_secret" "supabase" {
   for_each = var.supabase_services # Tạo secret cho mỗi service trong map
 
-  name = "${var.project_name}/${each.key}"
+  name        = "${var.project_name}/${each.key}"
   description = "Supabase credentials for ${each.key}"
 
   tags = merge(var.tags, {
@@ -13,7 +13,7 @@ resource "aws_secretsmanager_secret" "supabase" {
 resource "aws_secretsmanager_secret_version" "supabase_version" {
   for_each = var.supabase_services
 
-  secret_id     = aws_secretsmanager_secret.supabase[each.key].id
+  secret_id = aws_secretsmanager_secret.supabase[each.key].id
   secret_string = jsonencode({
     DATABASE_URL = each.value.database_url
     DIRECT_URL   = each.value.direct_url
@@ -34,11 +34,11 @@ resource "aws_secretsmanager_secret_version" "auth_version" {
   secret_id = aws_secretsmanager_secret.auth.id
 
   secret_string = jsonencode({
-    MONGO_USERNAME         = var.auth.mongo_username
-    MONGO_PASSWORD         = var.auth.mongo_password
-    MONGO_HOST             = var.auth.mongo_host
-    PRIVATE_KEY            = var.auth.private_key
-    REFRESH_TOKEN_SECRET   = var.auth.refresh_token_secret
+    MONGO_USERNAME       = var.auth_service.mongo_username
+    MONGO_PASSWORD       = var.auth_service.mongo_password
+    MONGO_HOST           = var.auth_service.mongo_host
+    PRIVATE_KEY          = var.auth_service.private_key
+    REFRESH_TOKEN_SECRET = var.auth_service.refresh_token_secret
   })
 }
 

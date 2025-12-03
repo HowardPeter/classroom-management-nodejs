@@ -1,5 +1,16 @@
 variable "project_name" {
-  type        = string
+  type    = string
+  default = ""
+}
+
+variable "region" {
+  type    = string
+  default = "ap-southeast-1"
+}
+
+variable "tags" {
+  type    = map(string)
+  default = {}
 }
 
 variable "vpc_cidr" {
@@ -15,9 +26,4 @@ variable "public_subnets" {
 variable "private_subnets" {
   description = "CIDR for private subnets"
   type        = list(string)
-}
-
-variable "tags" {
-  type        = map(string)
-  default = {}
 }
