@@ -92,11 +92,15 @@ module "elasticache" {
   subnet_ids         = module.networking.private_subnet_ids
 }
 
+# NOTE: ECR phải được tạo và push image trước khi tạo Lambda
 module "lambda" {
   source = "./modules/lambda"
 
   project_name = var.project_name
   tags         = var.tags
+
+  # Chỉnh "true" khi tất cả ECR được tạo và push image
+  ecr_enabled = false
 
   lambda_services = {
     auth = {
@@ -108,6 +112,9 @@ module "lambda" {
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "userSv:"
+
+        PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
+        SERVICE_SECRET_NAME    = module.secrets.auth_secret_name
       }
     }
     class = {
@@ -119,6 +126,16 @@ module "lambda" {
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "classSv:"
+
+        PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["class"]
+
+        AWS_REGION = var.aws_region
+        # WARN: module không thể gọi output chính nó nên phải hardcode tên function
+        # NOTE: Do đó cần hardcode đúng tên function
+        TEACHE_SERVICE_API  = "${var.project_name}-lambda-teacher-function"
+        STUDENT_SERVICE_API = "${var.project_name}-lambda-student-function"
+        USER_SERVICE_API    = "${var.project_name}-lambda-auth-function"
       }
     }
     student = {
@@ -130,6 +147,9 @@ module "lambda" {
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "studentSv:"
+
+        PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["student"]
       }
     }
     teacher = {
@@ -141,6 +161,11 @@ module "lambda" {
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "teacherSv:"
+
+        PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["teacher"]
+
+        AWS_BUCKET_NAME = module.s3_bucket.bucket_name
       }
     }
     tuition = {
@@ -152,7 +177,22 @@ module "lambda" {
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "tuitionSv:"
+
+        PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["tuition"]
+
+        AWS_REGION = var.aws_region
+        # WARN: Module không thể gọi output chính nó nên phải hardcode tên function
+        # NOTE: Do đó cần hardcode đúng tên function
+        CLASS_SERVICE_API   = "${var.project_name}-lambda-class-function"
+        STUDENT_SERVICE_API = "${var.project_name}-lambda-student-function"
       }
+    }
+
+    # Quyền invoke của function -> function(s)
+    invoke_permissions = {
+      class   = ["tuition"]
+      tuition = ["class"]
     }
   }
 
@@ -160,6 +200,10 @@ module "lambda" {
   auth_secret_arn       = module.secrets.auth_secret_arn
   public_key_secret_arn = module.secrets.public_key_secret_arn
   supabase_secret_arns  = module.secrets.supabase_secret_arns
+
+  # VPC config
+  vpc_subnet_ids         = module.networking.private_subnet_ids
+  vpc_security_group_ids = [module.networking.lambda_sg_id]
 }
 
 module "api_gateway" {

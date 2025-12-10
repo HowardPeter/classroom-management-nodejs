@@ -8,6 +8,12 @@ variable "tags" {
   default = {}
 }
 
+variable "ecr_enabled" {
+  description = "Whether ECR created and had pushed image"
+  type        = bool
+  default     = false
+}
+
 variable "lambda_services" {
   description = "Lambda function configs"
   type = map(object({
@@ -40,5 +46,23 @@ variable "public_key_secret_arn" {
 variable "supabase_secret_arns" {
   description = "ARN of secret manager (supabase services)"
   type        = map(string)
+  default     = {}
+}
+
+variable "vpc_subnet_ids" {
+  description = "List of VPC subnet IDs for Lambda functions"
+  type        = list(string)
+  default     = []
+}
+
+variable "vpc_security_group_ids" {
+  description = "List of VPC security group IDs for Lambda functions"
+  type        = list(string)
+  default     = []
+}
+
+variable "invoke_permissions" {
+  description = "Map of which lambda services can invoke which services"
+  type        = map(list(string))
   default     = {}
 }

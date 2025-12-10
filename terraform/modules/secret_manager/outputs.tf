@@ -15,3 +15,21 @@ output "public_key_secret_arn" {
   description = "ARN of public key secret"
   value       = aws_secretsmanager_secret.public_key.arn
 }
+
+output "supabase_secret_names" {
+  description = "Name of services using Supabase secrets"
+  value = {
+    for k, v in aws_secretsmanager_secret.supabase :
+    k => v.name
+  }
+}
+
+output "auth_secret_name" {
+  description = "Name of auth service secret"
+  value       = aws_secretsmanager_secret.auth.name
+}
+
+output "public_key_secret_name" {
+  description = "Name of public key secret"
+  value       = aws_secretsmanager_secret.public_key.name
+}
