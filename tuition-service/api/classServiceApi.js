@@ -1,34 +1,57 @@
 import axios from "axios";
-import { InternalServerError } from "#shared/errors/errors.js";
+import { logger } from "#shared/utils/index.js";
+import { LambdaInvoker } from "../utils/index.js";
 
-const URL = process.env.CLASS_SERVICE_URL;
+const CLASS_SERVICE = process.env.CLASS_SERVICE_API; // Development: localhost URL, Production: Lambda function name
 
 class ClassServiceClient {
-  constructor(baseURL) {
-    this.api = axios.create({ baseURL });
+  constructor() {
+    this.isProd = process.env.NODE_ENV === "production";
+
+    if (!this.isProd) {
+      this.api = axios.create({ baseURL: CLASS_SERVICE });
+    } else {
+      this.lambda = new LambdaInvoker();
+    }
   }
 
   async getClassById(id, accessToken) {
+    const route = `/${id}`;
     try {
-      const res = await this.api.get(`/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      return res.data;
+      if (!this.isProd) {
+        const res = await this.api.get(route, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        return res.data;
+      }
+      return await this.lambda.invoke("GET", route, accessToken, CLASS_SERVICE);
     } catch (err) {
-      throw new InternalServerError(`Class API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      if (!this.isProd) {
+        logger.error(`Class API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      } else {
+        logger.error("ClassService error:", err);
+      }
     }
   }
 
   async getUserClass(classId, userId, accessToken) {
+    const route = `/${classId}/permissions?user_id=${userId}`;
     try {
-      const res = await this.api.get(`/${classId}/permissions?user_id=${userId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-      return res.data;
+      if (!this.isProd) {
+        const res = await this.api.get(route, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        return res.data;
+      }
+      return await this.lambda.invoke("GET", route, accessToken, CLASS_SERVICE);
     } catch (err) {
-      throw new InternalServerError(`Class API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      if (!this.isProd) {
+        logger.error(`Class API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      } else {
+        logger.error("ClassService error:", err);
+      }
     }
   }
 }
 
-export default new ClassServiceClient(URL);
+export default new ClassServiceClient();

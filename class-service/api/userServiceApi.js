@@ -1,23 +1,37 @@
 import axios from "axios";
-import { InternalServerError } from "#shared/errors/errors.js";
+import { LambdaInvoker } from "../utils/index.js";
 
-const URL = process.env.USER_SERVICE_URL;
+const USER_SERVICE = process.env.USER_SERVICE_API; // Development: localhost URL, Production: Lambda function name
 
 class UserServiceClient {
-  constructor(baseURL) {
-    this.api = axios.create({ baseURL });
+  constructor() {
+    this.isProd = process.env.NODE_ENV === "production";
+
+    if (!this.isProd) {
+      this.api = axios.create({ baseURL: USER_SERVICE });
+    } else {
+      this.lambda = new LambdaInvoker();
+    }
   }
 
   async getUserByIds(ids, accessToken) {
+    const route = `/by-ids?ids=${ids}`;
     try {
-      const res = await this.api.get(`/by-ids?ids=${ids}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      return res.data;
+      if (!this.isProd) {
+        const res = await this.api.get(route, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        return res.data;
+      }
+      return await this.lambda.invoke("GET", route, accessToken, USER_SERVICE);
     } catch (err) {
-      throw new InternalServerError(`Auth API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      if (!this.isProd) {
+        logger.error(`Student API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      } else {
+        logger.error("StudentService error:", err);
+      }
     }
   }
 }
 
-export default new UserServiceClient(URL);
+export default new UserServiceClient();
