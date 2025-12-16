@@ -7,7 +7,7 @@ export default class SecretService {
       return {};
 
     const client = new SecretsManagerClient({
-      region: "ap-southeast-1",
+      region: process.env.AWS_REGION || "ap-southeast-1",
     });
     const res = await client.send(new GetSecretValueCommand({ SecretId: secretName }));
 
