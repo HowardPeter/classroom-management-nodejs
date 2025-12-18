@@ -8,12 +8,6 @@ variable "tags" {
   default = {}
 }
 
-variable "cloudwatch_log_group" {
-  description = "ARN of Cloudwatch API Gateway log group"
-  type        = string
-  default     = ""
-}
-
 variable "api_routes" {
   description = "Corresponding routes for Lambda functions"
   type = map(object({

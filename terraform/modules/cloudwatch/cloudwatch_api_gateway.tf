@@ -129,17 +129,6 @@ resource "aws_cloudwatch_metric_alarm" "apigw_4xx_errors" {
   })
 }
 
-# Tạo log group
-resource "aws_cloudwatch_log_group" "api_gateway" {
-  name              = "/aws/api_gw/${var.apigw.api_name}"
-  retention_in_days = 30
-
-  tags = merge(var.tags, {
-    Name    = "${var.project_name}-api-gateway-${var.apigw.api_name}-log"
-    ApiName = var.apigw.api_name
-  })
-}
-
 # Theo dõi 5xx Errors
 resource "aws_cloudwatch_metric_alarm" "apigw_5xx_errors" {
   alarm_name          = "${var.project_name}-apigw-5xx-errors"
@@ -202,7 +191,8 @@ resource "aws_cloudwatch_metric_alarm" "apigw_high_latency" {
   threshold           = 2500
   period              = 60
   evaluation_periods  = 5
-  statistic           = "p90" # 10% request chậm nhất
+  # INFO: extended_statistic hỗ trợ chỉ số p0.0 - p100
+  extended_statistic = "p90" # 10% request chậm nhất
 
   alarm_actions = [aws_sns_topic.notifications.arn]
   ok_actions    = [aws_sns_topic.notifications.arn]

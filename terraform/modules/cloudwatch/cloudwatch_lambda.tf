@@ -155,7 +155,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
   period              = 60
   evaluation_periods  = 15
   datapoints_to_alarm = 15
-  statistic           = "p95" # percentile
+  extended_statistic  = "p95" # percentile
 
   alarm_actions = [aws_sns_topic.notifications.arn]
   ok_actions    = [aws_sns_topic.notifications.arn]
@@ -171,12 +171,12 @@ resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
 }
 
 # Theo dõi Throttles (Lambda bị giới hạn tài nguyên, request) - Throttles > 0
-resource "aws_cloudwatch_metric_alarm" "lambda_duration" {
+resource "aws_cloudwatch_metric_alarm" "lambda_throttle" {
   for_each = var.function_name
 
   alarm_name          = "${var.project_name}-lambda-${each.key}-throttle"
   namespace           = "AWS/Lambda"
-  metric_name         = ""
+  metric_name         = "Throttles"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   threshold           = 0
   period              = 60

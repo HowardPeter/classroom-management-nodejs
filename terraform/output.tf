@@ -40,11 +40,11 @@ output "lambda_services" {
   value       = module.lambda.lambda_functions
 }
 
-# API Gateway
-output "api_gateway" {
-  value = {
-    api_endpoint = module.api_gateway.api_endpoint
-    api_name     = module.api_gateway.api_name
-    stage        = module.api_gateway.stage_name
-  }
-}
+# # API Gateway
+# output "api_gateway" {
+#   value = {
+#     api_endpoint = module.api_gateway.api_endpoint
+#     api_name     = module.api_gateway.api_name
+#     stage        = module.api_gateway.stage_name
+#   }
+# }

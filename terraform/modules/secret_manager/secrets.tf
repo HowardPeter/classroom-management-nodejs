@@ -2,7 +2,7 @@
 resource "aws_secretsmanager_secret" "supabase" {
   for_each = var.supabase_services # Tạo secret cho mỗi service trong map
 
-  name        = "${var.project_name}/${each.key}"
+  name        = "${var.project_name}/${each.key}-service"
   description = "Supabase credentials for ${each.key}"
 
   tags = merge(var.tags, {

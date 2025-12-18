@@ -4,6 +4,18 @@ locals {
     "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
   ]
+
+  # Phân tách policy từ generic_policy_arns để tạo map 1-1 service-policy
+  # Vd: auth_AWSLambdaBasicExecutionRole = { service = "auth", policy_arn = "..." }
+  shared_policy_map = merge([
+    for service, _ in var.lambda_services : {
+      for policy_arn in local.generic_policy_arns :
+      "${service}_${basename(policy_arn)}" => {
+        service    = service
+        policy_arn = policy_arn
+      }
+    }
+  ]...)
 }
 
 locals {
@@ -54,7 +66,6 @@ locals {
   validate_keys = length(local.mismatched_keys) == 0 ? true : file("ERROR: Keys in lambda_services and secrets_map must match. Mismatches: ${local.mismatched_keys}")
 }
 
-
 # TẠO IAM ROLE CHO 5 FUNCTIONS
 resource "aws_iam_role" "lambda_role" {
   for_each = var.lambda_services
@@ -81,14 +92,11 @@ resource "aws_iam_role" "lambda_role" {
 
 # GÁN POLICY
 # Gán policy chung cho 5 lambda function
-resource "aws_iam_role_policy_attachment" "generic_policy" {
-  for_each = {
-    for service, _ in var.lambda_services :
-    service => local.generic_policy_arns
-  }
+resource "aws_iam_role_policy_attachment" "shared" {
+  for_each = local.shared_policy_map
 
-  role       = aws_iam_role.lambda_role[each.key].name
-  policy_arn = each.value
+  role       = aws_iam_role.lambda_role[each.value.service].name
+  policy_arn = each.value.policy_arn
 }
 
 # NOTE: Gán each.key chéo (secret_map -> lambda_role, secrets) có thể gây lỗi nếu các element trong các biến có giá trị không đồng nhất

@@ -18,10 +18,10 @@ variable "lambda_services" {
   description = "Lambda function configs"
   type = map(object({
     image         = string
-    memory        = string
-    timeout       = string
-    architectures = set(string)
-    environment   = map(string)
+    memory        = number
+    timeout       = number
+    architectures = list(string)
+    environment   = map(any)
   }))
 }
 

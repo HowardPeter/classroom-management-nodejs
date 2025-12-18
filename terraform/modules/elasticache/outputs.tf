@@ -1,6 +1,6 @@
 output "cache_name" {
   description = "Serverless cache name"
-  value       = aws_elasticache_serverless_cache.main.cache_name
+  value       = aws_elasticache_serverless_cache.main.name
 }
 
 output "cache_arn" {

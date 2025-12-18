@@ -8,24 +8,24 @@ resource "aws_apigatewayv2_stage" "lambda_stage" {
   name        = var.tags.Environment
   auto_deploy = true
 
-  # Chỉ định metric hiển thị log trên Cloudwatch
-  access_log_settings {
-    destination_arn = var.cloudwatch_log_group
+  # # Chỉ định metric hiển thị log trên Cloudwatch (dùng khi có aws_cloudwatch_log_group)
+  # access_log_settings {
+  #   destination_arn = var.cloudwatch_log_group
 
-    format = jsonencode({
-      requestId               = "$context.requestId"
-      sourceIp                = "$context.identity.sourceIp"
-      requestTime             = "$context.requestTime"
-      protocol                = "$context.protocol"
-      httpMethod              = "$context.httpMethod"
-      resourcePath            = "$context.resourcePath"
-      routeKey                = "$context.routeKey"
-      status                  = "$context.status"
-      integrationErrorMessage = "$context.integrationErrorMessage"
-      integrationStatus       = "$context.integration.status"
-      latency                 = "$context.responseLatency"
-    })
-  }
+  #   format = jsonencode({
+  #     requestId               = "$context.requestId"
+  #     sourceIp                = "$context.identity.sourceIp"
+  #     requestTime             = "$context.requestTime"
+  #     protocol                = "$context.protocol"
+  #     httpMethod              = "$context.httpMethod"
+  #     resourcePath            = "$context.resourcePath"
+  #     routeKey                = "$context.routeKey"
+  #     status                  = "$context.status"
+  #     integrationErrorMessage = "$context.integrationErrorMessage"
+  #     integrationStatus       = "$context.integration.status"
+  #     latency                 = "$context.responseLatency"
+  #   })
+  # }
 }
 
 resource "aws_apigatewayv2_integration" "lambda_functions" {

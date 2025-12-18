@@ -9,3 +9,11 @@ output "lambda_functions" {
     }
   } : {}
 }
+
+output "lambda_iam_arn" {
+  description = "ARN of lambda functions IAM role"
+  value = {
+    for svc, iam in aws_iam_role.lambda_role :
+    svc => iam.arn
+  }
+}

@@ -1,3 +1,8 @@
+locals {
+  # Chỉnh "true" khi tất cả ECR được tạo và push image
+  ecr_enabled = true
+}
+
 module "networking" {
   source = "./modules/networking"
 
@@ -17,8 +22,8 @@ module "s3_bucket" {
   project_name = var.project_name
   tags         = var.tags
 
-  name               = "teacher-service"
-  allowed_principals = []
+  name               = "${var.project_name}-teacher-function-image-bucket"
+  allowed_principals = [module.lambda.lambda_iam_arn.teacher]
 }
 
 module "secrets" {
@@ -99,8 +104,7 @@ module "lambda" {
   project_name = var.project_name
   tags         = var.tags
 
-  # Chỉnh "true" khi tất cả ECR được tạo và push image
-  ecr_enabled = false
+  ecr_enabled = local.ecr_enabled
 
   lambda_services = {
     auth = {
@@ -128,9 +132,9 @@ module "lambda" {
         REDIS_PREFIX = "classSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["class"]
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.class
 
-        AWS_REGION = var.aws_region
+        # AWS_REGION = var.aws_region # Bỏ vì AWS tự inject
         # WARN: module không thể gọi output chính nó nên phải hardcode tên function
         # NOTE: Do đó cần hardcode đúng tên function
         TEACHE_SERVICE_API  = "${var.project_name}-lambda-teacher-function"
@@ -149,7 +153,7 @@ module "lambda" {
         REDIS_PREFIX = "studentSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["student"]
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.student
       }
     }
     teacher = {
@@ -163,8 +167,9 @@ module "lambda" {
         REDIS_PREFIX = "teacherSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["teacher"]
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.teacher
 
+        # AWS_REGION = var.aws_region # Bỏ vì AWS tự inject
         AWS_BUCKET_NAME = module.s3_bucket.bucket_name
       }
     }
@@ -179,21 +184,21 @@ module "lambda" {
         REDIS_PREFIX = "tuitionSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_name["tuition"]
+        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.tuition
 
-        AWS_REGION = var.aws_region
+        # AWS_REGION = var.aws_region # Bỏ vì AWS tự inject
         # WARN: Module không thể gọi output chính nó nên phải hardcode tên function
         # NOTE: Do đó cần hardcode đúng tên function
         CLASS_SERVICE_API   = "${var.project_name}-lambda-class-function"
         STUDENT_SERVICE_API = "${var.project_name}-lambda-student-function"
       }
     }
+  }
 
-    # Quyền invoke của function -> function(s)
-    invoke_permissions = {
-      class   = ["tuition"]
-      tuition = ["class"]
-    }
+  # Quyền invoke của function -> function(s)
+  invoke_permissions = {
+    class   = ["tuition"]
+    tuition = ["class"]
   }
 
   s3_arn                = module.s3_bucket.bucket_arn
@@ -211,8 +216,6 @@ module "api_gateway" {
 
   project_name = var.project_name
   tags         = var.tags
-
-  cloudwatch_log_group = module.cloudwatch.apigateway_log_group
 
   api_routes = {
     auth = {
@@ -248,6 +251,8 @@ module "cloudwatch" {
 
   project_name = var.project_name
   tags         = var.tags
+
+  email = "phuocnt1611@gmail.com"
 
   function_name = {
     auth    = module.lambda.lambda_functions.auth.name

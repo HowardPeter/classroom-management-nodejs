@@ -13,7 +13,6 @@ variable "name" {
   default = "teacher-service"
 }
 
-
 # variable "allowed_origins" {
 #   type = list(string)
 #   default = ["*"] # nên sửa thành domain frontend
