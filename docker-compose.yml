@@ -104,7 +104,6 @@ services:
     build:
       context: .
       dockerfile: auth-service/Dockerfile
-      target: development
     image: classroom-user:dev
     container_name: user
     ports:
@@ -128,7 +127,6 @@ services:
     build:
       context: .
       dockerfile: student-service/Dockerfile
-      target: development
     image: classroom-student:dev
     container_name: student
     ports:
@@ -145,13 +143,11 @@ services:
       - ./student-service/.env
     depends_on:
       - student-db
-      - auth
 
   class:
     build:
       context: .
       dockerfile: class-service/Dockerfile
-      target: development
     image: classroom-class:dev
     container_name: class
     ports:
@@ -168,13 +164,11 @@ services:
       - ./class-service/.env
     depends_on:
       - class-db
-      - auth
 
   tuition:
     build:
       context: .
       dockerfile: tuition-service/Dockerfile
-      target: development
     image: classroom-tuition:dev
     container_name: tuition
     ports:
@@ -191,13 +185,11 @@ services:
       - ./tuition-service/.env
     depends_on:
       - tuition-db
-      - auth
 
   teacher:
     build:
       context: .
       dockerfile: teacher-service/Dockerfile
-      target: development
     image: classroom-teacher:dev
     container_name: teacher
     ports:
@@ -214,7 +206,6 @@ services:
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - teacher-db
-      - auth
 
 volumes:
   redis_data:

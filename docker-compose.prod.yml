@@ -1,4 +1,4 @@
-# Docker compose dùng cho test database hosting
+# Docker compose dùng cho test database hosting và lambda container
 services:
   redis:
     image: redis:7-alpine
@@ -17,75 +17,182 @@ services:
   user:
     build:
       context: .
-      dockerfile: auth-service/Dockerfile
-      target: production
+      dockerfile: auth-service/Dockerfile.lambda
     image: classroom-user:prod
     container_name: user-prod
     ports:
-      - "3001:3001"
+      - "9001:8080"
+    environment:
+      - APP_ENV=development
     env_file:
       - ./auth-service/.env
       - ./env-prod/.env.user
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf -X POST http://localhost:8080/2015-03-31/functions/function/invocations \
+          -H 'Content-Type: application/json' \
+          -d '{
+            \"version\":\"2.0\",
+            \"routeKey\":\"GET /health\",
+            \"rawPath\":\"/health\",
+            \"requestContext\":{
+              \"http\":{
+                \"method\":\"GET\",
+                \"path\":\"/health\"
+              }
+            }
+          }' || exit 1"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   student:
     build:
       context: .
-      dockerfile: student-service/Dockerfile
-      target: production
+      dockerfile: student-service/Dockerfile.lambda
     image: classroom-student:prod
     container_name: student-prod
     ports:
-      - "3002:3002"
+      - "9002:8080"
+    environment:
+      - APP_ENV=development
     env_file:
       - ./student-service/.env
       - ./env-prod/.env.student
-    depends_on:
-      - user
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf -X POST http://localhost:8080/2015-03-31/functions/function/invocations \
+          -H 'Content-Type: application/json' \
+          -d '{
+            \"version\":\"2.0\",
+            \"routeKey\":\"GET /health\",
+            \"rawPath\":\"/health\",
+            \"requestContext\":{
+              \"http\":{
+                \"method\":\"GET\",
+                \"path\":\"/health\"
+              }
+            }
+          }' || exit 1"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   class:
     build:
       context: .
-      dockerfile: class-service/Dockerfile
-      target: production
+      dockerfile: class-service/Dockerfile.lambda
     image: classroom-class:prod
     container_name: class-prod
     ports:
-      - "3003:3003"
+      - "9003:8080"
+    environment:
+      - APP_ENV=development
     env_file:
       - ./class-service/.env
-      - ./env-prod/.env.class
-    depends_on:
-      - user
+      - ./env-prod/.env.clas
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf -X POST http://localhost:8080/2015-03-31/functions/function/invocations \
+          -H 'Content-Type: application/json' \
+          -d '{
+            \"version\":\"2.0\",
+            \"routeKey\":\"GET /health\",
+            \"rawPath\":\"/health\",
+            \"requestContext\":{
+              \"http\":{
+                \"method\":\"GET\",
+                \"path\":\"/health\"
+              }
+            }
+          }' || exit 1"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   tuition:
     build:
       context: .
-      dockerfile: tuition-service/Dockerfile
-      target: production
+      dockerfile: tuition-service/Dockerfile.lambda
     image: classroom-tuition:prod
     container_name: tuition-prod
     ports:
-      - "3004:3004"
+      - "9004:8080"
+    environment:
+      - APP_ENV=development
     env_file:
       - ./tuition-service/.env
       - ./env-prod/.env.tuition
-    depends_on:
-      - user
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf -X POST http://localhost:8080/2015-03-31/functions/function/invocations \
+          -H 'Content-Type: application/json' \
+          -d '{
+            \"version\":\"2.0\",
+            \"routeKey\":\"GET /health\",
+            \"rawPath\":\"/health\",
+            \"requestContext\":{
+              \"http\":{
+                \"method\":\"GET\",
+                \"path\":\"/health\"
+              }
+            }
+          }' || exit 1"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
   teacher:
     build:
       context: .
-      dockerfile: teacher-service/Dockerfile
-      target: production
+      dockerfile: teacher-service/Dockerfile.lambda
     image: classroom-teacher:prod
     container_name: teacher-prod
     ports:
-      - "3005:3005"
+      - "9005:8080"
+    environment:
+      - APP_ENV=development
     env_file:
       - ./teacher-service/.env
       - ./env-prod/.env.teacher
-    depends_on:
-      - user
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -sf -X POST http://localhost:8080/2015-03-31/functions/function/invocations \
+          -H 'Content-Type: application/json' \
+          -d '{
+            \"version\":\"2.0\",
+            \"routeKey\":\"GET /health\",
+            \"rawPath\":\"/health\",
+            \"requestContext\":{
+              \"http\":{
+                \"method\":\"GET\",
+                \"path\":\"/health\"
+              }
+            }
+          }' || exit 1"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 
 volumes:
   redis_data:
