@@ -1,6 +1,4 @@
-import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
-
 import TokenRepository from "../repositories/tokenRepository.js";
 import UserRepository from '../repositories/userRepository.js';
 import { asyncWrapper } from "#shared/middlewares/index.js"
@@ -13,8 +11,6 @@ import {
   ForbiddenError
 } from "#shared/errors/errors.js";
 import { createHash, hashToken, generateUuidv4, JwtFacade } from '../utils/index.js';
-
-dotenv.config();
 
 // POST /refresh
 // Cấp lại token khi accessToken hết hạn

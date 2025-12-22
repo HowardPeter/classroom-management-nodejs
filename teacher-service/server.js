@@ -15,6 +15,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(pinoLogger);
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use(authentication);
 
 app.use('/teachers', teacherRouter);

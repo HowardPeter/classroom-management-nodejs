@@ -1,11 +1,12 @@
-FROM node:22-alpine AS base
+FROM node:22-alpine
 
 WORKDIR /app
 
+# Cài curl do alpine không có sẵn
+RUN apk add --no-cache curl
+
 # Cần chạy build từ /root
 COPY tuition-service/package*.json ./
-
-FROM base AS development
 
 RUN npm install
 
@@ -15,26 +16,9 @@ COPY shared-libs ./shared-libs
 # Generate Prisma client cho môi trường Alpine (linux-musl)
 RUN npx prisma generate
 
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3004/health || exit 1
+
 EXPOSE 3004
 
 CMD ["npm", "run", "dev"]
-
-FROM base AS production
-
-RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 nodeusr
-
-RUN npm ci --omit=dev && npm cache clean --force
-
-COPY tuition-service/ .
-COPY shared-libs ./shared-libs
-
-RUN npx prisma generate --schema=prisma/schema.prisma
-
-USER nodeusr
-
-ENV NODE_ENV=production
-
-EXPOSE 3004
-
-CMD ["npm", "start"]

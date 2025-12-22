@@ -16,11 +16,15 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(pinoLogger);
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use(authentication);
 
-app.use('/tuition/invoices', checkClassExist, invoiceRouter);
-app.use('/tuition/payments', checkClassExist, paymentRouter);
-app.use('/tuition/reports', reportRouter);
+app.use('/tuitions/invoices', checkClassExist, invoiceRouter);
+app.use('/tuitions/payments', checkClassExist, paymentRouter);
+app.use('/tuitions/reports', reportRouter);
 
 app.use(routeNotFound);
 app.use(errorHandler);

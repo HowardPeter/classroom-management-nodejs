@@ -1,33 +1,21 @@
-FROM node:22-alpine AS base
+FROM node:22-alpine
 
 WORKDIR /app
 
-COPY auth-service/package*.json ./
+# Cài curl do alpine không có sẵn
+RUN apk add --no-cache curl
 
-FROM base AS development
+# Cần chạy build từ /root
+COPY auth-service/package*.json ./
 
 RUN npm install
 
 COPY auth-service/ .
 COPY shared-libs ./shared-libs
 
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3001/health || exit 1
+
 EXPOSE 3001
 
 CMD ["npm", "run", "dev"]
-
-FROM base AS production
-
-RUN npm ci --omit=dev && npm cache clean --force
-
-RUN addgroup --system --gid 1001 nodejs \
-    && adduser --system --uid 1001 nodeusr
-USER nodeusr
-
-COPY auth-service/ .
-COPY shared-libs ./shared-libs
-
-ENV NODE_ENV=production
-
-EXPOSE 3001
-
-CMD ["npm", "start"]
