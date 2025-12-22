@@ -3,7 +3,7 @@ import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-sec
 // NOTE: Configure aws cli để aws tự động lấy access key hoặc thêm credential khi tạo SecretsManagerClient (dev env)
 export default class SecretService {
   static async getSecret(secretName) {
-    if (process.env.NODE_ENV !== "production")
+    if (process.env.APP_ENV !== "production")
       return {};
 
     const client = new SecretsManagerClient({
@@ -15,7 +15,7 @@ export default class SecretService {
   }
 
   static async setDatabaseUrl(secretName) {
-    if (process.env.NODE_ENV !== "production")
+    if (process.env.APP_ENV !== "production")
       return;
 
     const secret = await this.getSecret(secretName);
