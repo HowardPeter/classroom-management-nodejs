@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken"
 import fs from 'fs'
 import { SecretService } from "#shared/utils/index.js"
 
-const secret = await SecretService.getSecret("prod/cr-user-sv");
+const secret = await SecretService.getSecret(process.env.SERVICE_SECRET_NAME);
 
 export default class JwtFacade {
   static ACCESS_TOKEN_SECRET = secret.PRIVATE_KEY || fs.readFileSync("private.pem", "utf8");
