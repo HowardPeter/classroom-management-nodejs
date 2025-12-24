@@ -52,7 +52,8 @@ export const createInvoice = asyncWrapper(async (req, res) => {
 
   // Kiểm tra student tồn tại
   const token = getBearer(req);
-  await StudentServiceClient.getStudentById(invoiceData.student_id, token);
+  const isStudentExist = await StudentServiceClient.getStudentById(invoiceData.student_id, token);
+  if (!isStudentExist) throw new NotFoundError("Student does not exist!");
 
   // Gán class_id vào data
   const { class_id: classId } = req.query;

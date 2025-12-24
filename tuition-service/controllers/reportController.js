@@ -1,5 +1,5 @@
 import { asyncWrapper } from "#shared/middlewares/index.js"
-import { BadRequestError } from "#shared/errors/errors.js"
+import { BadRequestError, NotFoundError } from "#shared/errors/errors.js"
 import { getBearer } from '#shared/utils/index.js'
 import { ClassServiceClient, StudentServiceClient } from '../api/index.js'
 import InvoiceRepository from "../repositories/invoiceRepository.js"
@@ -14,7 +14,8 @@ export const getClassMonthlyTuitionReport = asyncWrapper(async (req, res) => {
 
   // Kiểm tra class tồn tại
   const token = getBearer(req);
-  await ClassServiceClient.getClassById(classId, token);
+  const isClassExist = await ClassServiceClient.getClassById(classId, token);
+  if (!isClassExist) throw new NotFoundError("Class does not exist!");
 
   // Parse YYYY-MM và lấy các invoice trong tháng của class
   const [year, monthNum] = month.split("-");
@@ -86,7 +87,8 @@ export const getStudentTuitionReport = asyncWrapper(async (req, res) => {
 
   // Kiểm tra student tồn tại
   const token = getBearer(req);
-  const student = await StudentServiceClient.getStudentById(studentId, token);
+  const isStudentExist = await StudentServiceClient.getStudentById(studentId, token);
+  if (!isStudentExist) throw new NotFoundError("Student does not exist!");
 
   const studentInvoices = await InvoiceRepository.findMany({
     student_id: studentId,

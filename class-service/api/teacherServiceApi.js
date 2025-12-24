@@ -1,23 +1,37 @@
 import axios from "axios";
-import { InternalServerError } from "#shared/errors/errors.js";
+import { LambdaInvoker } from "../utils/index.js";
 
-const URL = process.env.TEACHER_SERVICE_URL;
+const TEACHER_SERVICE = process.env.TEACHER_SERVICE_API; // Development: localhost URL, Production: Lambda function name
 
 class TeacherServiceClient {
-  constructor(baseURL) {
-    this.api = axios.create({ baseURL });
+  constructor() {
+    this.isProd = process.env.NODE_ENV === "production";
+
+    if (!this.isProd) {
+      this.api = axios.create({ baseURL: TEACHER_SERVICE });
+    } else {
+      this.lambda = new LambdaInvoker();
+    }
   }
 
   async getTeacherById(id, accessToken) {
+    const route = `/${id}`;
     try {
-      const res = await this.api.get(`/${id}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      return res.data;
+      if (!this.isProd) {
+        const res = await this.api.get(route, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        return res.data;
+      }
+      return await this.lambda.invoke("GET", route, accessToken, TEACHER_SERVICE);
     } catch (err) {
-      throw new InternalServerError(`Teacher API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      if (!this.isProd) {
+        logger.error(`Student API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      } else {
+        logger.error("StudentService error:", err);
+      }
     }
   }
 }
 
-export default new TeacherServiceClient(URL);
+export default new TeacherServiceClient();

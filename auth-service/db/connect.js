@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 import { InternalServerError } from "#shared/errors/errors.js";
 import { SecretService } from "#shared/utils/index.js"
 
-const secret = await SecretService.getSecret("prod/cr-user-sv");
+const secret = await SecretService.getSecret(process.env.SERVICE_SECRET_NAME);
 
 const MONGO_USERNAME = secret.MONGO_USERNAME || process.env.MONGO_USERNAME;
 const MONGO_PASSWORD = secret.MONGO_PASSWORD || process.env.MONGO_PASSWORD;

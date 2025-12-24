@@ -1,13 +1,13 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { SecretService } from "#shared/utils/index.js"
+// import { SecretService } from "#shared/utils/index.js"
 
-const secret = await SecretService.getSecret("prod/cr-teacher-sv");
+// const secret = await SecretService.getSecret(process.env.SERVICE_SECRET_NAME);
 
 const bucketName = process.env.AWS_BUCKET_NAME;
-const region = process.env.AWS_REGION;
-const accessKeyId = secret.AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
-const secretAccessKey = secret.AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
+const region = process.env.AWS_REGION || "ap-southeast-1";
+// const accessKeyId = secret.AWS_ACCESS_KEY_ID || process.env.AWS_ACCESS_KEY_ID;
+// const secretAccessKey = secret.AWS_SECRET_ACCESS_KEY || process.env.AWS_SECRET_ACCESS_KEY;
 
 export default class S3Service {
   static s3Client() {

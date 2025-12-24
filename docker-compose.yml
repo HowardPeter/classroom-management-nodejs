@@ -120,6 +120,7 @@ services:
       - MONGO_HOST=user-db
       - MONGO_DB=userdb
       - CHOKIDAR_USEPOLLING=true
+      - APP_ENV=development
     depends_on:
       - user-db
 
@@ -139,6 +140,7 @@ services:
       - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
       - DIRECT_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
       - CHOKIDAR_USEPOLLING=true
+      - APP_ENV=development
     env_file:
       - ./student-service/.env
     depends_on:
@@ -160,6 +162,7 @@ services:
       - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
       - DIRECT_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
       - CHOKIDAR_USEPOLLING=true
+      - APP_ENV=development
     env_file:
       - ./class-service/.env
     depends_on:
@@ -181,6 +184,7 @@ services:
       - DATABASE_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
       - DIRECT_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
       - CHOKIDAR_USEPOLLING=true
+      - APP_ENV=development
     env_file:
       - ./tuition-service/.env
     depends_on:
@@ -204,6 +208,7 @@ services:
       - DATABASE_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
       - DIRECT_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
       - CHOKIDAR_USEPOLLING=true
+      - APP_ENV=development
     depends_on:
       - teacher-db
 

@@ -1,5 +1,6 @@
 import { checkPermission } from '../utils/index.js'
 import { getBearer } from '#shared/utils/index.js'
+import { ForbiddenError } from "#shared/errors/errors.js"
 
 export const authorize = (...allowedRoles) => {
   return async (req, res, next) => {
@@ -10,12 +11,8 @@ export const authorize = (...allowedRoles) => {
 
       const allowed = await checkPermission(classId, userId, token, allowedRoles);
 
-      if (!allowed) {
-        return res.status(403).json({
-          success: false,
-          msg: "User does not have permission to perform this action!",
-        });
-      }
+      if (!allowed)
+        throw new ForbiddenError("User does not have permission to perform this action!");
 
       next();
     } catch (err) {

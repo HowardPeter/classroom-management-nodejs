@@ -16,8 +16,13 @@ export default async function authentication(req, res, next) {
 
   // NOTE: RSA key cần xuống dòng đúng để RS256 verify hợp lệ, key lưu ở AWS Secret Manager NHẬP BẰNG PLAINTEXT, chuyển thành 1 dòng và \n ở nơi xuống dòng
   // NOTE: {"PUBLIC_KEY": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A\n...-----END PUBLIC KEY-----"}
-  const secret = await SecretService.getSecret("prod/cr-publickey");
-  const publickey = secret.PUBLIC_KEY || fs.readFileSync("public.pem", "utf8");
+  var publickey;
+  if (process.env.NODE_ENV === 'production') {
+    const secret = await SecretService.getSecret(process.env.PUBLIC_KEY_SECRET_NAME);
+    publickey = secret.PUBLIC_KEY;
+  } else {
+    publickey = fs.readFileSync("public.pem", "utf8");
+  }
 
   jwt.verify(token, publickey, { algorithms: ["RS256"] }, (err, user) => {
     if (err) {
