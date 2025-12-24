@@ -13,3 +13,9 @@ variable "services" {
   description = "Service list for ECR repository"
   default     = []
 }
+
+variable "expired_days" {
+  description = "Number of days untagged image stored"
+  type        = number
+  default     = 7
+}

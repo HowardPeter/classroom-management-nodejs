@@ -75,6 +75,8 @@ module "ecr" {
     "tuition-service",
     "teacher-service"
   ]
+
+  expired_days = 7
 }
 
 module "elasticache" {

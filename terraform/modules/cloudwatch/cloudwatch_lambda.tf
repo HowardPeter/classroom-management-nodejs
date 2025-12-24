@@ -177,7 +177,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_throttle" {
   alarm_name          = "${var.project_name}-lambda-${each.key}-throttle"
   namespace           = "AWS/Lambda"
   metric_name         = "Throttles"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
+  comparison_operator = "GreaterThanThreshold"
   threshold           = 0
   period              = 60
   evaluation_periods  = 5

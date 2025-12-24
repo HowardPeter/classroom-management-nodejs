@@ -1,11 +1,15 @@
 resource "aws_apigatewayv2_api" "lambda_http" {
   name          = "${var.project_name}-serverless-lambda-gw"
   protocol_type = "HTTP"
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-serverless-lambda-gw"
+  })
 }
 
 resource "aws_apigatewayv2_stage" "lambda_stage" {
   api_id      = aws_apigatewayv2_api.lambda_http.id
-  name        = var.tags.Environment
+  name        = "$default"
   auto_deploy = true
 
   # # Chỉ định metric hiển thị log trên Cloudwatch (dùng khi có aws_cloudwatch_log_group)

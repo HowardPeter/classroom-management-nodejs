@@ -10,7 +10,6 @@ resource "aws_lambda_function" "functions" {
   memory_size = each.value.memory
   timeout     = each.value.timeout
 
-  handler       = "server.handler"
   architectures = each.value.architectures
 
   # Cấu hình VPC cho truy cập elasticache trong VPC
