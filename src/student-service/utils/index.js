@@ -1,1 +1,1 @@
-export { default as normalizeFilter } from './nomalizeFilter.js';
+export { default as normalizeFilter } from './nomalize-filter.js';
