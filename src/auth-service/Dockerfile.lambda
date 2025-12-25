@@ -8,8 +8,8 @@ COPY auth-service/package*.json .
 # Không cài devDependencies và xóa cache npm
 RUN npm ci --omit=dev && npm cache clean --force
 
-COPY auth-service/ .
-COPY shared-libs/ ./shared-libs
+COPY src/auth-service/ .
+COPY src/shared-libs/ ./shared-libs
 
 FROM public.ecr.aws/lambda/nodejs@sha256:ba6eb28e407ede3f5d8ab441aadd4ad7558cfdb099f324f195d1f6ddc885d4bf AS runner
 

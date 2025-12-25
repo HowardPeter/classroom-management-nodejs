@@ -6,12 +6,12 @@ WORKDIR /app
 RUN apk add --no-cache curl
 
 # Cần chạy build từ /root
-COPY class-service/package*.json ./
+COPY src/class-service/package*.json .
 
 RUN npm install
 
-COPY class-service/ .
-COPY shared-libs ./shared-libs
+COPY src/class-service/ .
+COPY src/shared-libs ./shared-libs
 
 # Generate Prisma client
 RUN npx prisma generate

@@ -6,12 +6,12 @@ WORKDIR /app
 RUN apk add --no-cache curl
 
 # Cần chạy build từ /root
-COPY teacher-service/package*.json ./
+COPY src/teacher-service/package*.json .
 
 RUN npm install
 
-COPY teacher-service/ .
-COPY shared-libs ./shared-libs
+COPY src/teacher-service/ .
+COPY src/shared-libs ./shared-libs
 
 # Generate Prisma client cho môi trường Alpine (linux-musl)
 RUN npx prisma generate

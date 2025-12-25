@@ -6,12 +6,12 @@ WORKDIR /app
 RUN apk add --no-cache curl
 
 # Cần chạy build từ /root
-COPY auth-service/package*.json ./
+COPY src/auth-service/package*.json .
 
 RUN npm install
 
-COPY auth-service/ .
-COPY shared-libs ./shared-libs
+COPY src/auth-service/ .
+COPY src/shared-libs ./shared-libs
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3001/health || exit 1

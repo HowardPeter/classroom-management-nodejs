@@ -4,7 +4,7 @@ FROM public.ecr.aws/lambda/nodejs@sha256:ba6eb28e407ede3f5d8ab441aadd4ad7558cfdb
 WORKDIR /var/task
 
 # NOTE: Cần chạy build từ root
-COPY tuition-service/package*.json .
+COPY src/class-service/package*.json .
 
 RUN npm ci
 
@@ -14,8 +14,8 @@ WORKDIR /var/task
 
 COPY --from=deps /var/task/node_modules ./node_modules
 
-COPY tuition-service/ .
-COPY shared-libs ./shared-libs
+COPY src/class-service/ .
+COPY src/shared-libs ./shared-libs
 
 # Generate Prisma client
 RUN npx prisma generate

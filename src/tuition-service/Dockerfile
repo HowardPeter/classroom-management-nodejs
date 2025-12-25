@@ -6,19 +6,19 @@ WORKDIR /app
 RUN apk add --no-cache curl
 
 # Cần chạy build từ /root
-COPY student-service/package*.json ./
+COPY src/tuition-service/package*.json .
 
 RUN npm install
 
-COPY student-service/ .
-COPY shared-libs ./shared-libs
+COPY src/tuition-service/ .
+COPY src/shared-libs ./shared-libs
 
 # Generate Prisma client cho môi trường Alpine (linux-musl)
 RUN npx prisma generate
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3002/health || exit 1
+  CMD curl -f http://localhost:3004/health || exit 1
 
-EXPOSE 3002
+EXPOSE 3004
 
 CMD ["npm", "run", "dev"]
