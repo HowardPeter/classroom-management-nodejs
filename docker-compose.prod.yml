@@ -40,7 +40,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/users/health\"
               }
             }
           }' || exit 1"
@@ -76,7 +76,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/students/health\"
               }
             }
           }' || exit 1"
@@ -112,7 +112,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/classes/health\"
               }
             }
           }' || exit 1"
@@ -148,7 +148,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/tuitions/health\"
               }
             }
           }' || exit 1"
@@ -184,7 +184,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/teachers/health\"
               }
             }
           }' || exit 1"

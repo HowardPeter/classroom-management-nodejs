@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(pinoLogger);
 
-app.get('/health', (req, res) => {
+app.get('/students/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
