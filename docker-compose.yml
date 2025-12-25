@@ -103,17 +103,17 @@ services:
   auth:
     build:
       context: .
-      dockerfile: auth-service/Dockerfile
+      dockerfile: src/auth-service/Dockerfile
     image: classroom-user:dev
     container_name: user
     ports:
       - "3001:3001"
     volumes:
-      - ./auth-service:/app:delegated
-      - ./shared-libs:/app/shared-libs:delegated
+      - ./src/auth-service:/app:delegated
+      - ./src/shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     env_file:
-      - "./auth-service/.env"
+      - "./src/auth-service/.env"
     environment:
       - MONGO_USERNAME=admin
       - MONGO_PASSWORD=secret
@@ -127,14 +127,14 @@ services:
   student:
     build:
       context: .
-      dockerfile: student-service/Dockerfile
+      dockerfile: src/student-service/Dockerfile
     image: classroom-student:dev
     container_name: student
     ports:
       - "3002:3002"
     volumes:
-      - ./student-service:/app:delegated
-      - ./shared-libs:/app/shared-libs:delegated
+      - ./src/student-service:/app:delegated
+      - ./src/shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@student-db:5432/studentdb?schema=public
@@ -142,21 +142,21 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - APP_ENV=development
     env_file:
-      - ./student-service/.env
+      - ./src/student-service/.env
     depends_on:
       - student-db
 
   class:
     build:
       context: .
-      dockerfile: class-service/Dockerfile
+      dockerfile: src/class-service/Dockerfile
     image: classroom-class:dev
     container_name: class
     ports:
       - "3003:3003"
     volumes:
-      - ./class-service:/app:delegated
-      - ./shared-libs:/app/shared-libs:delegated
+      - ./src/class-service:/app:delegated
+      - ./src/shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@class-db:5432/classdb?schema=public
@@ -164,21 +164,21 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - APP_ENV=development
     env_file:
-      - ./class-service/.env
+      - ./src/class-service/.env
     depends_on:
       - class-db
 
   tuition:
     build:
       context: .
-      dockerfile: tuition-service/Dockerfile
+      dockerfile: src/tuition-service/Dockerfile
     image: classroom-tuition:dev
     container_name: tuition
     ports:
       - "3004:3004"
     volumes:
-      - ./tuition-service:/app:delegated
-      - ./shared-libs:/app/shared-libs:delegated
+      - ./src/tuition-service:/app:delegated
+      - ./src/shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     environment:
       - DATABASE_URL=postgresql://admin:secret@tuition-db:5432/tuitiondb?schema=public
@@ -186,24 +186,24 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - APP_ENV=development
     env_file:
-      - ./tuition-service/.env
+      - ./src/tuition-service/.env
     depends_on:
       - tuition-db
 
   teacher:
     build:
       context: .
-      dockerfile: teacher-service/Dockerfile
+      dockerfile: src/teacher-service/Dockerfile
     image: classroom-teacher:dev
     container_name: teacher
     ports:
       - "3005:3005"
     volumes:
-      - ./teacher-service:/app:delegated
-      - ./shared-libs:/app/shared-libs:delegated
+      - ./src/teacher-service:/app:delegated
+      - ./src/shared-libs:/app/shared-libs:delegated
       - /app/node_modules
     env_file:
-      - ./teacher-service/.env
+      - ./src/teacher-service/.env
     environment:
       - DATABASE_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public
       - DIRECT_URL=postgresql://admin:secret@teacher-db:5432/teacherdb?schema=public

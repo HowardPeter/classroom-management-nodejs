@@ -17,7 +17,7 @@ services:
   user:
     build:
       context: .
-      dockerfile: auth-service/Dockerfile.lambda
+      dockerfile: src/src/auth-service/Dockerfile.lambda
     image: classroom-user:prod
     container_name: user-prod
     ports:
@@ -25,7 +25,7 @@ services:
     environment:
       - APP_ENV=development
     env_file:
-      - ./auth-service/.env
+      - ./src/auth-service/.env
       - ./env-prod/.env.user
     healthcheck:
       test:
@@ -40,7 +40,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/users/health\"
               }
             }
           }' || exit 1"
@@ -53,7 +53,7 @@ services:
   student:
     build:
       context: .
-      dockerfile: student-service/Dockerfile.lambda
+      dockerfile: src/student-service/Dockerfile.lambda
     image: classroom-student:prod
     container_name: student-prod
     ports:
@@ -61,7 +61,7 @@ services:
     environment:
       - APP_ENV=development
     env_file:
-      - ./student-service/.env
+      - ./src/student-service/.env
       - ./env-prod/.env.student
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/students/health\"
               }
             }
           }' || exit 1"
@@ -89,7 +89,7 @@ services:
   class:
     build:
       context: .
-      dockerfile: class-service/Dockerfile.lambda
+      dockerfile: src/class-service/Dockerfile.lambda
     image: classroom-class:prod
     container_name: class-prod
     ports:
@@ -97,7 +97,7 @@ services:
     environment:
       - APP_ENV=development
     env_file:
-      - ./class-service/.env
+      - ./src/class-service/.env
       - ./env-prod/.env.clas
     healthcheck:
       test:
@@ -112,7 +112,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/classes/health\"
               }
             }
           }' || exit 1"
@@ -125,7 +125,7 @@ services:
   tuition:
     build:
       context: .
-      dockerfile: tuition-service/Dockerfile.lambda
+      dockerfile: src/tuition-service/Dockerfile.lambda
     image: classroom-tuition:prod
     container_name: tuition-prod
     ports:
@@ -133,7 +133,7 @@ services:
     environment:
       - APP_ENV=development
     env_file:
-      - ./tuition-service/.env
+      - ./src/tuition-service/.env
       - ./env-prod/.env.tuition
     healthcheck:
       test:
@@ -148,7 +148,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/tuitions/health\"
               }
             }
           }' || exit 1"
@@ -161,7 +161,7 @@ services:
   teacher:
     build:
       context: .
-      dockerfile: teacher-service/Dockerfile.lambda
+      dockerfile: src/teacher-service/Dockerfile.lambda
     image: classroom-teacher:prod
     container_name: teacher-prod
     ports:
@@ -169,7 +169,7 @@ services:
     environment:
       - APP_ENV=development
     env_file:
-      - ./teacher-service/.env
+      - ./src/teacher-service/.env
       - ./env-prod/.env.teacher
     healthcheck:
       test:
@@ -184,7 +184,7 @@ services:
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
-                \"path\":\"/health\"
+                \"path\":\"/teachers/health\"
               }
             }
           }' || exit 1"
