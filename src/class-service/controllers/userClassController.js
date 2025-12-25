@@ -1,4 +1,3 @@
-import ClassRepository from '../repositories/classRepository.js'
 import UserClassRepository from '../repositories/userClassRepository.js'
 import { asyncWrapper } from "#shared/middlewares/index.js"
 import { getBearer } from '#shared/utils/index.js'

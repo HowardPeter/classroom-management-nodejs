@@ -2,7 +2,7 @@ import { asyncWrapper } from "#shared/middlewares/index.js"
 import { paginate, getBearer } from '#shared/utils/index.js'
 import { NotFoundError, BadRequestError, ConflictError, ForbiddenError } from "#shared/errors/errors.js"
 import InvoiceRepository from '../repositories/invoiceRepository.js'
-import { StudentServiceClient } from '../api/index.js'
+import { ClassServiceClient, StudentServiceClient } from '../api/index.js'
 import { normalizeFilter } from '../utils/index.js'
 
 // GET /tuition/invoices/?class_id=xxx
@@ -55,9 +55,12 @@ export const createInvoice = asyncWrapper(async (req, res) => {
   const isStudentExist = await StudentServiceClient.getStudentById(invoiceData.student_id, token);
   if (!isStudentExist) throw new NotFoundError("Student does not exist!");
 
-  // Gán class_id vào data
+  // Kiểm tra student đã enroll class chưa
   const { class_id: classId } = req.query;
-  invoiceData.class_id = classId;
+  const isStudentEnrolled = await ClassServiceClient.checkStudentEnrollment(classId, invoiceData.student_id, token);
+  if(!isStudentEnrolled) throw new NotFoundError("Student is not enrolled the class!");
+
+  invoiceData.class_id = classId; // Gán class_id vào input data
 
   const newInvoice = await InvoiceRepository.createOne(invoiceData);
 

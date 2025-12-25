@@ -1,6 +1,6 @@
 import express from 'express'
 import { authorize, validate, checkClassExist } from '../middlewares/index.js'
-import { getStudentsInClass, addStudentToClass, changeStudentClass, removeStudentFromClass } from '../controllers/enrollmentController.js'
+import { getStudentsInClass, addStudentToClass, changeStudentClass, removeStudentFromClass, checkStudentEnrollment } from '../controllers/enrollmentController.js'
 
 const router = express.Router()
 
@@ -13,6 +13,7 @@ router
 
 router
   .route('/:id/students/:studentId')
+  .get(checkStudentEnrollment)
   .patch(authorize("owner", "manager"), changeStudentClass)
   .delete(authorize("owner", "manager"), removeStudentFromClass)
 

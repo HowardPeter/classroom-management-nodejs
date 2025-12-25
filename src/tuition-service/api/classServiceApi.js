@@ -52,6 +52,25 @@ class ClassServiceClient {
       }
     }
   }
+
+  async checkStudentEnrollment(classId, studentId, accessToken) {
+    const route = `/${classId}/students/${studentId}`;
+    try {
+      if (!this.isProd) {
+        const res = await this.api.get(route, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        return res.data;
+      }
+      return await this.lambda.invoke("GET", route, accessToken, CLASS_SERVICE);
+    } catch (err) {
+      if (!this.isProd) {
+        logger.error(`Class API returned ${err.response.status}: ${err.response.data?.msg || err.message}`);
+      } else {
+        logger.error("ClassService error:", err);
+      }
+    }
+  }
 }
 
 export default new ClassServiceClient();

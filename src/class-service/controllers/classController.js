@@ -53,7 +53,8 @@ export const createNewClass = asyncWrapper(async (req, res) => {
   // Kiểm tra teacher tồn tại
   if (newClassData.teacher_id) {
     const token = getBearer(req);
-    await TeacherServiceClient.getTeacherById(newClassData.teacher_id, token);
+    const isTeacherExist = await TeacherServiceClient.getTeacherById(newClassData.teacher_id, token);
+    if (!isTeacherExist) throw new NotFoundError("Teacher does not exist!");
   }
 
   const result = await ClassRepository.createOne(newClassData);
@@ -94,7 +95,8 @@ export const updateClass = asyncWrapper(async (req, res) => {
   // Kiểm tra teacher tồn tại
   if (updateData.teacher_id) {
     const token = getBearer(req);
-    await TeacherServiceClient.getTeacherById(updateData.teacher_id, token);
+    const isTeacherExist = await TeacherServiceClient.getTeacherById(updateData.teacher_id, token);
+    if (!isTeacherExist) throw new NotFoundError("Teacher does not exist!");
   }
 
   const result = await ClassRepository.updateById(classId, updateData);

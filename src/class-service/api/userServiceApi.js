@@ -1,5 +1,6 @@
 import axios from "axios";
 import { LambdaInvoker } from "../utils/index.js";
+import { logger } from "#shared/utils/index.js";
 
 const USER_SERVICE = process.env.USER_SERVICE_API; // Development: localhost URL, Production: Lambda function name
 

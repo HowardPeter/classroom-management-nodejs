@@ -31,7 +31,8 @@ export const addStudentToClass = asyncWrapper(async (req, res) => {
   if (!studentId) throw new BadRequestError("Cannot get student Id!");
 
   // Kiểm tra student tồn tại
-  await StudentServiceClient.getStudentById(studentId, token);
+  const isStudentExist = await StudentServiceClient.getStudentById(studentId, token);
+  if (!isStudentExist) throw new NotFoundError("Student does not exist!");
 
   const newEnrollment = {
     class_id: classId,
@@ -67,7 +68,8 @@ export const changeStudentClass = asyncWrapper(async (req, res) => {
   if (!isClass) throw new NotFoundError("Class not found!");
 
   // Kiểm tra student tồn tại
-  await StudentServiceClient.getStudentById(studentId, token);
+  const isStudentExist = await StudentServiceClient.getStudentById(studentId, token);
+  if (!isStudentExist) throw new NotFoundError("Student does not exist!");
 
   const hasEnrollment = await EnrollmentRepository.findOne({
     student_id_class_id: {
@@ -96,7 +98,8 @@ export const removeStudentFromClass = asyncWrapper(async (req, res) => {
   const token = getBearer(req);
 
   // Kiểm tra student tồn tại
-  await StudentServiceClient.getStudentById(studentId, token);
+  const isStudentExist = await StudentServiceClient.getStudentById(studentId, token);
+  if (!isStudentExist) throw new NotFoundError("Student does not exist!");
 
   const enrollment = await EnrollmentRepository.findOne({
     student_id_class_id: {
@@ -118,4 +121,21 @@ export const removeStudentFromClass = asyncWrapper(async (req, res) => {
     success: true,
     msg: "Remove student from class successfully"
   });
+})
+
+export const checkStudentEnrollment = asyncWrapper(async (req, res) => {
+  const classId = req.params.id;
+  const studentId = req.params.studentId;
+
+  const isStudentEnrolled = await EnrollmentRepository.findOne({
+    student_id_class_id: {
+      student_id: studentId,
+      class_id: classId,
+    }
+  });
+
+  if (!isStudentEnrolled)
+    return res.status(404).json({ success: false });
+
+  res.status(200).json({ success: true });
 })
