@@ -19,12 +19,11 @@ This system consists of 5 microservices:
 - **Caching**: Redis (Database caching)
 - **ORM**: Prisma (PostgreSQL services), Mongoose (MongoDB)
 - **Authentication**: JWT with RSA keys
-- **Secret Management**: AWS Secrets Manager
 - **Containerization**: Docker & Docker Compose
-- **Storage**: AWS S3 Bucket (profile image)
 - **CI/CD**: GitHub Actions
+- **Deployment**: AWS and Terraform (IaC)
 
-## Quick Start
+## Development Set Up
 
 ### Prerequisites
 
@@ -34,15 +33,8 @@ This system consists of 5 microservices:
 ### Running with Docker
 
 ```bash
-# Clone the repository
-git clone https://github.com/HowardPeter/classroom-management-nodejs.git
-cd classroom-management-nodejs
-
 # Start all services
 docker-compose up -d
-
-# View logs
-docker-compose logs -f
 ```
 
 ### Services will be available at:
@@ -53,7 +45,7 @@ docker-compose logs -f
 - Tuition Service: http://localhost:3004
 - Teacher Service: http://localhost:3005
 
-## Database Setup
+## Database
 
 The system uses multiple databases:
 
@@ -65,39 +57,57 @@ The system uses multiple databases:
   - Teacher DB (teacherdb)
   - Tuition DB (tuitiondb)
 
-Database migrations are handled automatically via Prisma.
-
-## Development
-
-### Local Development Setup
-
-```bash
-# Install dependencies for each service
-cd auth-service && npm install
-cd ../student-service && npm install
-cd ../class-service && npm install
-cd ../teacher-service && npm install
-cd ../tuition-service && npm install
-
-# Run individual services
-npm run dev
-```
-
 ### Environment Variables
 
 Each service requires its own `.env` file. Check individual service directories for required environment variables.
 
-**Auth Service** requires refresh token in `.env`:
+**Auth Service**:
 ```
-REFRESH_TOKEN_SECRET=your-refresh-token
+REFRESH_TOKEN_SECRET=your-refresh-token-secret
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PREFIX=userSv:
+ACCESS_TOKEN_EXPIRY='1h'
+REFRESH_TOKEN_EXPIRY='7d'
 ```
 
-**Teacher Service** requires AWS S3 configuration in `.env`:
+**Student Service**:
+```
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PREFIX=studentSv:
+```
+
+**Class Service**:
+```
+STUDENT_SERVICE_API="http://student:3002/students"
+TEACHER_SERVICE_API="http://teacher:3005/teachers"
+USER_SERVICE_API="http://auth:3001/users"
+AWS_REGION="your-aws-region"
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PREFIX=classSv:
+```
+
+**Teacher Service**:
 ```
 AWS_BUCKET_NAME=your-bucket-name
-AWS_BUCKET_REGION=your-region
-AWS_ACCESS_KEY=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_REGION="your-aws-region"
+AWS_ACCESS_KEY_ID=your-access-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-access-key
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PREFIX=teacherSv:
+```
+
+**Tuition Service**:
+```
+CLASS_SERVICE_API="http://class:3003/classes"
+STUDENT_SERVICE_API="http://student:3002/students"
+AWS_REGION="your-aws-region"
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_PREFIX=tuitionSv:
 ```
 
 ## API Documentation
@@ -160,27 +170,6 @@ AWS_SECRET_ACCESS_KEY=your-secret-key
 #### Reports
 - `GET /reports/class/:classId` - Get class monthly tuition report
 - `GET /reports/student/:studentId` - Get student tuition report
-
-## Project Structure
-
-```
-├── auth-service/          # Authentication microservice
-├── student-service/       # Student management
-├── class-service/         # Class and enrollment management
-├── teacher-service/       # Teacher profile management
-├── tuition-service/       # Payment and billing
-├── shared-libs/           # Shared utilities and middleware
-├── docker-compose.yml     # Container orchestration
-└── README.md
-```
-
-## Shared Libraries
-
-The `shared-libs` directory contains:
-- Error handling middleware
-- Authentication utilities
-- Pagination helpers
-- Common validation functions
 
 ## Security Features
 
