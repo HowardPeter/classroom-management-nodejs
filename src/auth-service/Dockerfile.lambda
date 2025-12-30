@@ -3,7 +3,7 @@ FROM public.ecr.aws/lambda/nodejs@sha256:ba6eb28e407ede3f5d8ab441aadd4ad7558cfdb
 # Lambda workdir chuẩn
 WORKDIR /var/task
 
-COPY auth-service/package*.json .
+COPY src/auth-service/package*.json .
 
 # Không cài devDependencies và xóa cache npm
 RUN npm ci --omit=dev && npm cache clean --force

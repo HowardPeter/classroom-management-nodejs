@@ -1,6 +1,6 @@
 Dockerfile
-.env
+**/.env
 node_modules
 .gitignore
-**.pem
+**/*.pem
 tests
