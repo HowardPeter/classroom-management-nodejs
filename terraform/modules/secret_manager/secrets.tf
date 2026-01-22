@@ -1,24 +1,23 @@
-# Secrets cho các service dùng supabase
-resource "aws_secretsmanager_secret" "supabase" {
-  for_each = var.supabase_services # Tạo secret cho mỗi service trong map
+# # Secrets cho các service dùng supabase
+# resource "aws_secretsmanager_secret" "supabase" {
+#   for_each = var.supabase_services # Tạo secret cho mỗi service trong map
 
-  name        = "${var.project_name}/${each.key}-service"
-  description = "Supabase credentials for ${each.key}"
+#   name        = "${var.project_name}/${each.key}-service"
+#   description = "Supabase credentials for ${each.key}"
 
-  tags = merge(var.tags, {
-    Service = each.key
-  })
-}
+#   tags = merge(var.tags, {
+#     Service = each.key
+#   })
+# }
 
-resource "aws_secretsmanager_secret_version" "supabase_version" {
-  for_each = var.supabase_services
+# resource "aws_secretsmanager_secret_version" "supabase_version" {
+#   for_each = var.supabase_services
 
-  secret_id = aws_secretsmanager_secret.supabase[each.key].id
-  secret_string = jsonencode({
-    DATABASE_URL = each.value.database_url
-    DIRECT_URL   = each.value.direct_url
-  })
-}
+#   secret_id = aws_secretsmanager_secret.supabase[each.key].id
+#   secret_string = jsonencode({
+#     DATABASE_URL = each.value.database_url
+#   })
+# }
 
 # Auth service secret (Mongo Atlas + Keys)
 resource "aws_secretsmanager_secret" "auth" {

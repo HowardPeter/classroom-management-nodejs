@@ -27,22 +27,22 @@ locals {
     ]
 
     class = [
-      var.supabase_secret_arns["class"],
+      # var.supabase_secret_arns["class"],
       var.public_key_secret_arn
     ]
 
     student = [
-      var.supabase_secret_arns["student"],
+      # var.supabase_secret_arns["student"],
       var.public_key_secret_arn
     ]
 
     tuition = [
-      var.supabase_secret_arns["tuition"],
+      # var.supabase_secret_arns["tuition"],
       var.public_key_secret_arn
     ]
 
     teacher = [
-      var.supabase_secret_arns["teacher"],
+      # var.supabase_secret_arns["teacher"],
       var.public_key_secret_arn
     ]
   }

@@ -43,11 +43,11 @@ variable "public_key_secret_arn" {
   default     = ""
 }
 
-variable "supabase_secret_arns" {
-  description = "ARN of secret manager (supabase services)"
-  type        = map(string)
-  default     = {}
-}
+# variable "supabase_secret_arns" {
+#   description = "ARN of secret manager (supabase services)"
+#   type        = map(string)
+#   default     = {}
+# }
 
 variable "vpc_subnet_ids" {
   description = "List of VPC subnet IDs for Lambda functions"

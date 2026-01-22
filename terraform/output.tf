@@ -16,7 +16,7 @@ output "secrets_arns" {
   value = {
     auth_secret_arn       = module.secrets.auth_secret_arn
     public_key_secret_arn = module.secrets.public_key_secret_arn
-    supabase_secret_arns  = module.secrets.supabase_secret_arns
+    # supabase_secret_arns  = module.secrets.supabase_secret_arns
   }
 }
 

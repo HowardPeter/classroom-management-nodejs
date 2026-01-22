@@ -21,8 +21,8 @@ variable "tags" {
 
 variable "ecr_enabled" {
   description = "True when all ECR repos have its image"
-  type = bool
-  default = true
+  type        = bool
+  default     = true
 }
 
 # SECRET MANAGER VARIABLES
@@ -37,46 +37,23 @@ variable "auth" {
   sensitive = true
 }
 
-# Student service secret value
+# Supabase service secret value
 variable "student_db_url" {
   type      = string
   sensitive = true
 }
 
-variable "student_direct_url" {
-  type      = string
-  sensitive = true
-}
-
-# Class service secret value
 variable "class_db_url" {
   type      = string
   sensitive = true
 }
 
-variable "class_direct_url" {
-  type      = string
-  sensitive = true
-}
-
-# Teacher service secret value
 variable "teacher_db_url" {
   type      = string
   sensitive = true
 }
 
-variable "teacher_direct_url" {
-  type      = string
-  sensitive = true
-}
-
-# Tuition service secret value
 variable "tuition_db_url" {
-  type      = string
-  sensitive = true
-}
-
-variable "tuition_direct_url" {
   type      = string
   sensitive = true
 }

@@ -35,24 +35,20 @@ module "secrets" {
     refresh_token_secret = "${var.auth.refresh_token_secret}"
   }
 
-  supabase_services = {
-    student = {
-      database_url = "${var.student_db_url}"
-      direct_url   = "${var.student_direct_url}"
-    }
-    teacher = {
-      database_url = "${var.teacher_db_url}"
-      direct_url   = "${var.teacher_direct_url}"
-    }
-    class = {
-      database_url = "${var.class_db_url}"
-      direct_url   = "${var.class_direct_url}"
-    }
-    tuition = {
-      database_url = "${var.tuition_db_url}"
-      direct_url   = "${var.tuition_direct_url}"
-    }
-  }
+  # supabase_services = {
+  #   student = {
+  #     database_url = "${var.student_db_url}"
+  #   }
+  #   teacher = {
+  #     database_url = "${var.teacher_db_url}"
+  #   }
+  #   class = {
+  #     database_url = "${var.class_db_url}"
+  #   }
+  #   tuition = {
+  #     database_url = "${var.tuition_db_url}"
+  #   }
+  # }
 
   public_key = file("./key/public.pem")
 }
@@ -110,6 +106,8 @@ module "lambda" {
       timeout       = 10
       architectures = ["arm64"]
       environment = {
+        NODE_ENV = "production"
+
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "userSv:"
@@ -124,19 +122,23 @@ module "lambda" {
       timeout       = 10
       architectures = ["arm64"]
       environment = {
+        NODE_ENV = "production"
+
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "classSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.class
+        # SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.class
 
-        # AWS_REGION = var.aws_region # Bỏ vì AWS tự inject
+        # INFO: AWS tự inject env AWS_REGION
         # WARN: module không thể gọi output chính nó nên phải hardcode tên function
         # NOTE: Do đó cần hardcode đúng tên function
-        TEACHE_SERVICE_API  = "${var.project_name}-lambda-teacher-function"
+        TEACHER_SERVICE_API = "${var.project_name}-lambda-teacher-function"
         STUDENT_SERVICE_API = "${var.project_name}-lambda-student-function"
         USER_SERVICE_API    = "${var.project_name}-lambda-auth-function"
+
+        DATABASE_URL = var.class_db_url
       }
     }
     student = {
@@ -145,12 +147,17 @@ module "lambda" {
       timeout       = 10
       architectures = ["arm64"]
       environment = {
+        NODE_ENV = "production"
+
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "studentSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.student
+        # SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.student
+
+        DATABASE_URL = var.student_db_url
+
       }
     }
     teacher = {
@@ -159,15 +166,18 @@ module "lambda" {
       timeout       = 10
       architectures = ["arm64"]
       environment = {
+        NODE_ENV = "production"
+
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "teacherSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.teacher
+        # SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.teacher
 
-        # AWS_REGION = var.aws_region # Bỏ vì AWS tự inject
         AWS_BUCKET_NAME = module.s3_bucket.bucket_name
+
+        DATABASE_URL = var.teacher_db_url
       }
     }
     tuition = {
@@ -176,18 +186,21 @@ module "lambda" {
       timeout       = 10
       architectures = ["arm64"]
       environment = {
+        NODE_ENV = "production"
+
         REDIS_HOST   = module.elasticache.endpoint_address
         REDIS_PORT   = module.elasticache.endpoint_port
         REDIS_PREFIX = "tuitionSv:"
 
         PUBLIC_KEY_SECRET_NAME = module.secrets.public_key_secret_name
-        SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.tuition
+        # SERVICE_SECRET_NAME    = module.secrets.supabase_secret_names.tuition
 
-        # AWS_REGION = var.aws_region # Bỏ vì AWS tự inject
         # WARN: Module không thể gọi output chính nó nên phải hardcode tên function
         # NOTE: Do đó cần hardcode đúng tên function
         CLASS_SERVICE_API   = "${var.project_name}-lambda-class-function"
         STUDENT_SERVICE_API = "${var.project_name}-lambda-student-function"
+
+        DATABASE_URL = var.tuition_db_url
       }
     }
   }
@@ -201,7 +214,7 @@ module "lambda" {
   s3_arn                = module.s3_bucket.bucket_arn
   auth_secret_arn       = module.secrets.auth_secret_arn
   public_key_secret_arn = module.secrets.public_key_secret_arn
-  supabase_secret_arns  = module.secrets.supabase_secret_arns
+  # supabase_secret_arns  = module.secrets.supabase_secret_arns
 
   # VPC config
   vpc_subnet_ids         = module.networking.private_subnet_ids

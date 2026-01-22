@@ -8,12 +8,6 @@ auth = {
 
 # Supabase PostgreSQL ORM connection strings
 student_db_url     = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
-student_direct_url = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
-
 class_db_url       = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
-
 teacher_db_url     = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
-teacher_direct_url = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
-
 tuition_db_url     = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"
-tuition_direct_url = "postgresql://postgres:password@db.your-supabase-project.supabase.co:5432/postgres"

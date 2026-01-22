@@ -8,13 +8,12 @@ variable "tags" {
   default = {}
 }
 
-variable "supabase_services" {
-  description = "Secret for supabase connection string"
-  type = map(object({
-    database_url = string
-    direct_url   = string
-  }))
-}
+# variable "supabase_services" {
+#   description = "Secret for supabase connection string"
+#   type = map(object({
+#     database_url = string
+#   }))
+# }
 
 variable "auth_service" {
   type = object({
