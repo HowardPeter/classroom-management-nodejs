@@ -12,6 +12,11 @@ resource "aws_lambda_function" "functions" {
 
   architectures = each.value.architectures
 
+  # Bật X-ray tracing
+  tracing_config {
+    mode = "Active"
+  }
+
   # Cấu hình VPC cho truy cập elasticache trong VPC
   vpc_config {
     subnet_ids         = var.vpc_subnet_ids

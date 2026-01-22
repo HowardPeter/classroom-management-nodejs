@@ -19,6 +19,12 @@ variable "tags" {
   }
 }
 
+variable "ecr_enabled" {
+  description = "True when all ECR repos have its image"
+  type = bool
+  default = true
+}
+
 # SECRET MANAGER VARIABLES
 variable "auth" {
   type = object({

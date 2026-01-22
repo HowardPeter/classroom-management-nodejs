@@ -17,7 +17,7 @@ services:
   user:
     build:
       context: .
-      dockerfile: src/src/auth-service/Dockerfile.lambda
+      dockerfile: src/auth-service/Dockerfile.lambda
     image: classroom-user:prod
     container_name: user-prod
     ports:
@@ -27,6 +27,10 @@ services:
     env_file:
       - ./src/auth-service/.env
       - ./env-prod/.env.user
+    volumes:
+      - ./src/auth-service:/var/task:delegated
+      - ./src/shared-libs:/var/task/shared-libs:delegated
+      - /var/task/node_modules
     healthcheck:
       test:
         [
@@ -35,8 +39,8 @@ services:
           -H 'Content-Type: application/json' \
           -d '{
             \"version\":\"2.0\",
-            \"routeKey\":\"GET /health\",
-            \"rawPath\":\"/health\",
+            \"routeKey\":\"GET /users/health\",
+            \"rawPath\":\"/users/health\",
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
@@ -63,6 +67,10 @@ services:
     env_file:
       - ./src/student-service/.env
       - ./env-prod/.env.student
+    volumes:
+      - ./src/student-service:/var/task:delegated
+      - ./src/shared-libs:/var/task/shared-libs:delegated
+      - /var/task/node_modules
     healthcheck:
       test:
         [
@@ -71,8 +79,8 @@ services:
           -H 'Content-Type: application/json' \
           -d '{
             \"version\":\"2.0\",
-            \"routeKey\":\"GET /health\",
-            \"rawPath\":\"/health\",
+            \"routeKey\":\"GET /students/health\",
+            \"rawPath\":\"/students/health\",
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
@@ -99,6 +107,10 @@ services:
     env_file:
       - ./src/class-service/.env
       - ./env-prod/.env.clas
+    volumes:
+      - ./src/class-service:/var/task:delegated
+      - ./src/shared-libs:/var/task/shared-libs:delegated
+      - /var/task/node_modules
     healthcheck:
       test:
         [
@@ -107,8 +119,8 @@ services:
           -H 'Content-Type: application/json' \
           -d '{
             \"version\":\"2.0\",
-            \"routeKey\":\"GET /health\",
-            \"rawPath\":\"/health\",
+            \"routeKey\":\"GET /classes/health\",
+            \"rawPath\":\"/classes/health\",
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
@@ -135,6 +147,10 @@ services:
     env_file:
       - ./src/tuition-service/.env
       - ./env-prod/.env.tuition
+    volumes:
+      - ./src/tuition-service:/var/task:delegated
+      - ./src/shared-libs:/var/task/shared-libs:delegated
+      - /var/task/node_modules
     healthcheck:
       test:
         [
@@ -143,8 +159,8 @@ services:
           -H 'Content-Type: application/json' \
           -d '{
             \"version\":\"2.0\",
-            \"routeKey\":\"GET /health\",
-            \"rawPath\":\"/health\",
+            \"routeKey\":\"GET /tuitions/health\",
+            \"rawPath\":\"/tuitions/health\",
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",
@@ -171,6 +187,10 @@ services:
     env_file:
       - ./src/teacher-service/.env
       - ./env-prod/.env.teacher
+    volumes:
+      - ./src/teacher-service:/var/task:delegated
+      - ./src/shared-libs:/var/task/shared-libs:delegated
+      - /var/task/node_modules
     healthcheck:
       test:
         [
@@ -179,8 +199,8 @@ services:
           -H 'Content-Type: application/json' \
           -d '{
             \"version\":\"2.0\",
-            \"routeKey\":\"GET /health\",
-            \"rawPath\":\"/health\",
+            \"routeKey\":\"GET /teachers/health\",
+            \"rawPath\":\"/teachers/health\",
             \"requestContext\":{
               \"http\":{
                 \"method\":\"GET\",

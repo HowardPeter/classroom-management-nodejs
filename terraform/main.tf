@@ -1,8 +1,3 @@
-locals {
-  # Chỉnh "true" khi tất cả ECR được tạo và push image
-  ecr_enabled = true
-}
-
 module "networking" {
   source = "./modules/networking"
 
@@ -106,7 +101,7 @@ module "lambda" {
   project_name = var.project_name
   tags         = var.tags
 
-  ecr_enabled = local.ecr_enabled
+  ecr_enabled = var.ecr_enabled
 
   lambda_services = {
     auth = {
