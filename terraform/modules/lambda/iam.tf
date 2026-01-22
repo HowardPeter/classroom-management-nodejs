@@ -3,6 +3,7 @@ locals {
     "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
     "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess",
   ]
 
   # Phân tách policy từ generic_policy_arns để tạo map 1-1 service-policy
