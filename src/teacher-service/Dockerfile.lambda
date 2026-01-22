@@ -29,9 +29,7 @@ WORKDIR /var/task
 
 COPY --from=builder /var/task .
 
-# APP_ENV test AWS infra local
 ENV NODE_ENV=production
-ENV APP_ENV=production
 
 # Lambda handler
 CMD ["server.handler"]
