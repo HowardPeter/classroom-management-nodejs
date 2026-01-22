@@ -4,9 +4,6 @@ import serverless from 'serverless-http'
 
 import { classRouter, enrollmentRouter, userClassRouter } from './routes/index.js';
 import { authentication, errorHandler, routeNotFound, pinoLogger } from '#shared/middlewares/index.js';
-import { SecretService } from "#shared/utils/index.js"
-
-await SecretService.setDatabaseUrl(process.env.SERVICE_SECRET_NAME);
 
 const app = express();
 const PORT = 3003;

@@ -4,9 +4,6 @@ import cookieParser from "cookie-parser";
 
 import router from './routes/studentRoutes.js'
 import { authentication, errorHandler, routeNotFound, pinoLogger } from '#shared/middlewares/index.js'
-import { SecretService } from "#shared/utils/index.js"
-
-await SecretService.setDatabaseUrl(process.env.SERVICE_SECRET_NAME);
 
 const app = express();
 const PORT = 3002;

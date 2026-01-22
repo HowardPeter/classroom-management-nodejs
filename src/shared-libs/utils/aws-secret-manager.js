@@ -1,10 +1,14 @@
 import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
+import { NotFoundError } from "#shared/errors/errors.js"
 
 // NOTE: Configure aws cli để aws tự động lấy access key hoặc thêm credential khi tạo SecretsManagerClient (dev env)
 export default class SecretService {
   static async getSecret(secretName) {
-    if (process.env.APP_ENV !== "production")
+    if (process.env.NODE_ENV !== "production")
       return {};
+
+    if (!secretName)
+      throw new NotFoundError("SERVICE_SECRET_NAME is not defined");
 
     const client = new SecretsManagerClient({
       region: process.env.AWS_REGION || "ap-southeast-1",
@@ -12,15 +16,6 @@ export default class SecretService {
     const res = await client.send(new GetSecretValueCommand({ SecretId: secretName }));
 
     return JSON.parse(res.SecretString || "{}");
-  }
-
-  static async setDatabaseUrl(secretName) {
-    if (process.env.APP_ENV !== "production")
-      return;
-
-    const secret = await this.getSecret(secretName);
-    const databaseUrl = secret.DATABASE_URL;
-    process.env.DATABASE_URL = databaseUrl;
   }
 }
 
