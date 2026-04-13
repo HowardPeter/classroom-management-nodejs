@@ -4,7 +4,7 @@ A backend microservices-based management system to help user manage their learni
 
 ## Architecture
 
-This system consists of 5 microservices:
+#### The system consists of 5 microservices:
 
 - **Auth Service** (Port 3001) - User authentication and authorization
 - **Student Service** (Port 3002) - Student data management
@@ -12,16 +12,31 @@ This system consists of 5 microservices:
 - **Teacher Service** (Port 3005) - Teacher profile management
 - **Tuition Service** (Port 3004) - Payment and invoice management
 
+#### AWS Deployment Architecture
+
+![AWS Deployment Architecture](./docs/deploy-aws-architecture.jpg)
+
+The microservices are deployed on AWS with the following architecture:
+
+- **ECR (Elastic Container Registry)** - Stores Docker images for each service
+- **Lambda** - Runs each microservice as a containerized function (arm64, deployed from ECR images)
+- **API Gateway (HTTP API)** - Single entry point that routes requests to the corresponding Lambda function
+- **ElastiCache Serverless (Valkey)** - Shared serverless caching layer for all services
+- **S3** - Image file storage, with versioning, lifecycle policies, and SSE encryption
+- **Secrets Manager** - Stores sensitive credentials (MongoDB connection, JWT keys, refresh token secret)
+- **CloudWatch** - Monitoring and alerting for Lambda functions, API Gateway, and ElastiCache
+- **VPC** - Lambda functions run in private subnets with a NAT Gateway for outbound access
+
 ## Tech Stack
 
-- **Backend**: Node.js, Express.js
+- **Backend**: Node.js, Javascript
 - **Databases**: MongoDB (Auth), PostgreSQL (Students, Classes, Teachers, Tuition)
 - **Caching**: Redis (Database caching)
 - **ORM**: Prisma (PostgreSQL services), Mongoose (MongoDB)
 - **Authentication**: JWT with RSA keys
 - **Containerization**: Docker & Docker Compose
 - **CI/CD**: GitHub Actions
-- **Deployment**: AWS and Terraform (IaC)
+- **Terraform** - Manages all AWS infrastructure as Infrastructure as Code
 
 ## Development Set Up
 
